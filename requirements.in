@@ -3,7 +3,7 @@ matplotlib
 numpy<1.20.0; python_version<'3.7'
 numpy>=1.20.0; python_version>='3.7'
 openpyxl
-pandas==1.1.5
+pandas==1.2.2
 psycopg2
 pycairo
 pygobject>=3.27
