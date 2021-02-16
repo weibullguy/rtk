@@ -92,7 +92,7 @@ def mock_program_dao(monkeypatch):
 class TestCreateControllers:
     """Class for controller initialization test suite."""
     @pytest.mark.unit
-    def test_data_manager(self):
+    def test_data_manager_create(self):
         """__init__() should return a Revision data manager."""
         DUT = dmRevision()
 
@@ -144,6 +144,15 @@ class TestSelectMethods:
         assert isinstance(_revision, RAMSTKRevision)
         assert _revision.availability_logistics == 0.9986
         assert _revision.name == 'Original Revision'
+
+    @pytest.mark.unit
+    def test_do_select_revision_tree_exists(self, mock_program_dao):
+        """do_select() should clear any existing tree when selecting
+        revisions."""
+        DUT = dmRevision()
+        DUT.do_connect(mock_program_dao)
+        DUT.do_select_all()
+        DUT.do_select_all()
 
     @pytest.mark.unit
     def test_do_select_unknown_table(self, mock_program_dao):
@@ -302,7 +311,7 @@ class TestInsertMethods:
                         'succeed_insert_revision')
 
     @pytest.mark.unit
-    def test_do_insert_database_error(self):
+    def test_do_insert_revision_database_error(self):
         """_do_insert_revision() should send the success message after
         successfully inserting a new revision."""
         pub.subscribe(self.on_fail_insert_revision, 'fail_insert_revision')

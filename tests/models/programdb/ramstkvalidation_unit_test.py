@@ -2,20 +2,66 @@
 # type: ignore
 # -*- coding: utf-8 -*-
 #
-#       tests.models.programdb.test_ramstkvalidation.py is part of The RAMSTK
-#       Project
+#       tests.models.programdb.ramstkvalidation_unit_test.py is part of The
+#       RAMSTK Project
 #
 # All rights reserved.
-"""Test class for testing the RAMSTKValidation module algorithms and models."""
+# Copyright 2007 - 2021 Doyle Rowland doyle.rowland <AT> reliaqual <DOT> com
+"""Class for testing the RAMSTKValidation module algorithms and models."""
 
 # Standard Library Imports
 from datetime import date, timedelta
 
 # Third Party Imports
+# noinspection PyPackageRequirements
 import pytest
+# noinspection PyUnresolvedReferences
+from mocks import MockDAO
 
 # RAMSTK Package Imports
 from ramstk.models.programdb import RAMSTKValidation
+
+
+@pytest.fixture
+def mock_program_dao(monkeypatch):
+    _validation_1 = RAMSTKValidation()
+    _validation_1.revision_id = 1
+    _validation_1.validation_id = 1
+    _validation_1.acceptable_maximum = 0.0
+    _validation_1.acceptable_mean = 0.0
+    _validation_1.acceptable_minimum = 0.0
+    _validation_1.acceptable_variance = 0.0
+    _validation_1.confidence = 95.0
+    _validation_1.cost_average = 0.0
+    _validation_1.cost_ll = 0.0
+    _validation_1.cost_maximum = 0.0
+    _validation_1.cost_mean = 0.0
+    _validation_1.cost_minimum = 0.0
+    _validation_1.cost_ul = 0.0
+    _validation_1.cost_variance = 0.0
+    _validation_1.date_end = date.today() + timedelta(days=30)
+    _validation_1.date_start = date.today()
+    _validation_1.description = 'Test Validation'
+    _validation_1.measurement_unit = ''
+    _validation_1.name = ''
+    _validation_1.status = 0.0
+    _validation_1.task_specification = ''
+    _validation_1.task_type = ''
+    _validation_1.time_average = 0.0
+    _validation_1.time_ll = 0.0
+    _validation_1.time_maximum = 0.0
+    _validation_1.time_mean = 0.0
+    _validation_1.time_minimum = 0.0
+    _validation_1.time_ul = 0.0
+    _validation_1.time_variance = 0.0
+
+    DAO = MockDAO()
+    DAO.table = [
+        _validation_1,
+    ]
+
+    yield DAO
+
 
 ATTRIBUTES = {
     'acceptable_maximum': 0.0,
@@ -48,17 +94,15 @@ ATTRIBUTES = {
 }
 
 
-@pytest.mark.usefixtures('test_program_dao')
-class TestRAMSTKValidation():
+@pytest.mark.usefixtures('mock_program_dao')
+class TestRAMSTKValidation:
     """Class for testing the RAMSTKValidation model."""
-    @pytest.mark.integration
-    def test_ramstkvalidation_create(self, test_program_dao):
-        """ __init__() should create an RAMSTKValidation model. """
-        DUT = test_program_dao.session.query(RAMSTKValidation).first()
+    @pytest.mark.unit
+    def test_ramstkvalidation_create(self, mock_program_dao):
+        """__init__() should create an RAMSTKValidation model."""
+        DUT = mock_program_dao.do_select_all(RAMSTKValidation)[0]
 
         assert isinstance(DUT, RAMSTKValidation)
-
-        # Verify class attributes are properly initialized.
         assert DUT.__tablename__ == 'ramstk_validation'
         assert DUT.revision_id == 1
         assert DUT.validation_id == 1
@@ -74,8 +118,8 @@ class TestRAMSTKValidation():
         assert DUT.cost_minimum == 0.0
         assert DUT.cost_ul == 0.0
         assert DUT.cost_variance == 0.0
-        assert DUT.date_end == date(2019, 8, 20)
-        assert DUT.date_start == date(2019, 7, 21)
+        assert DUT.date_end == date.today() + timedelta(days=30)
+        assert DUT.date_start == date.today()
         assert DUT.description == 'Test Validation'
         assert DUT.measurement_unit == ''
         assert DUT.name == ''
@@ -90,10 +134,10 @@ class TestRAMSTKValidation():
         assert DUT.time_ul == 0.0
         assert DUT.time_variance == 0.0
 
-    @pytest.mark.integration
-    def test_get_attributes(self, test_program_dao):
-        """ get_attributes() should return a dict of attribute values. """
-        DUT = test_program_dao.session.query(RAMSTKValidation).first()
+    @pytest.mark.unit
+    def test_get_attributes(self, mock_program_dao):
+        """get_attributes() should return a dict of attribute values."""
+        DUT = mock_program_dao.do_select_all(RAMSTKValidation)[0]
 
         _attributes = DUT.get_attributes()
         assert _attributes['revision_id'] == 1
@@ -110,8 +154,8 @@ class TestRAMSTKValidation():
         assert _attributes['cost_minimum'] == 0.0
         assert _attributes['cost_ul'] == 0.0
         assert _attributes['cost_variance'] == 0.0
-        assert _attributes['date_end'] == date(2019, 8, 20)
-        assert _attributes['date_start'] == date(2019, 7, 21)
+        assert _attributes['date_end'] == date.today() + timedelta(days=30)
+        assert _attributes['date_start'] == date.today()
         assert _attributes['description'] == 'Test Validation'
         assert _attributes['measurement_unit'] == ''
         assert _attributes['name'] == ''
@@ -126,35 +170,38 @@ class TestRAMSTKValidation():
         assert _attributes['time_ul'] == 0.0
         assert _attributes['time_variance'] == 0.0
 
-    @pytest.mark.integration
-    def test_set_attributes(self, test_program_dao):
-        """ set_attributes() should return a zero error code on success. """
-        DUT = test_program_dao.session.query(RAMSTKValidation).first()
+    @pytest.mark.unit
+    def test_set_attributes(self, mock_program_dao):
+        """set_attributes() should return a zero error code on success."""
+        DUT = mock_program_dao.do_select_all(RAMSTKValidation)[0]
 
         assert DUT.set_attributes(ATTRIBUTES) is None
 
-    @pytest.mark.integration
-    def test_set_attributes_none_value(self, test_program_dao):
-        """set_attributes() should set an attribute to it's default value when the attribute is passed with a None value."""
-        DUT = test_program_dao.session.query(RAMSTKValidation).first()
+    @pytest.mark.unit
+    def test_set_attributes_none_value(self, mock_program_dao):
+        """set_attributes() should set an attribute to it's default value when
+        the attribute is passed with a None value."""
+        DUT = mock_program_dao.do_select_all(RAMSTKValidation)[0]
 
         ATTRIBUTES['description'] = None
 
         assert DUT.set_attributes(ATTRIBUTES) is None
         assert DUT.get_attributes()['description'] == ''
 
-    @pytest.mark.integration
-    def test_set_attributes_unknown_attributes(self, test_program_dao):
-        """set_attributes() should raise an AttributeError when passed an unknown attribute."""
-        DUT = test_program_dao.session.query(RAMSTKValidation).first()
+    @pytest.mark.unit
+    def test_set_attributes_unknown_attributes(self, mock_program_dao):
+        """set_attributes() should raise an AttributeError when passed an
+        unknown attribute."""
+        DUT = mock_program_dao.do_select_all(RAMSTKValidation)[0]
 
         with pytest.raises(AttributeError):
             DUT.set_attributes({'shibboly-bibbly-boo': 0.9998})
 
-    @pytest.mark.integration
-    def test_calculate_task_time(self, test_program_dao):
-        """ calculate() returns False on successfully calculating tasks times. """
-        DUT = test_program_dao.session.query(RAMSTKValidation).first()
+    @pytest.mark.unit
+    def test_calculate_task_time(self, mock_program_dao):
+        """calculate() returns False on successfully calculating tasks
+        times."""
+        DUT = mock_program_dao.do_select_all(RAMSTKValidation)[0]
 
         DUT.time_minimum = 25.2
         DUT.time_average = 36.8
@@ -166,10 +213,11 @@ class TestRAMSTKValidation():
         assert DUT.time_ul == pytest.approx(42.2572199)
         assert DUT.time_variance == pytest.approx(9.9225)
 
-    @pytest.mark.integration
-    def test_calculate_task_cost(self, test_program_dao):
-        """ calculate() returns False on successfully calculating tasks costs. """
-        DUT = test_program_dao.session.query(RAMSTKValidation).first()
+    @pytest.mark.unit
+    def test_calculate_task_cost(self, mock_program_dao):
+        """calculate() returns False on successfully calculating tasks
+        costs."""
+        DUT = mock_program_dao.do_select_all(RAMSTKValidation)[0]
 
         DUT.cost_minimum = 252.00
         DUT.cost_average = 368.00

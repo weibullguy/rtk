@@ -2,21 +2,66 @@
 # type: ignore
 # -*- coding: utf-8 -*-
 #
-#       tests.models.programdb.TestRAMSTKMode.py is part of The RAMSTK Project
+#       tests.models.programdb.ramstkmode_unit_test.py is part of The RAMSTK
+#       Project
 #
 # All rights reserved.
-# Copyright 2007 - 2019 Doyle Rowland doyle.rowland <AT> reliaqual <DOT> com
-"""Test class for testing the RAMSTKMode module algorithms and models."""
+# Copyright 2007 - 2021 Doyle Rowland doyle.rowland <AT> reliaqual <DOT> com
+"""Class for testing the RAMSTKMode module algorithms and models."""
 
 # Third Party Imports
+# noinspection PyPackageRequirements
 import pytest
+# noinspection PyUnresolvedReferences
+from mocks import MockDAO
 
 # RAMSTK Package Imports
 from ramstk.models.programdb import RAMSTKMode
 
+
+@pytest.fixture
+def mock_program_dao(monkeypatch):
+    _mode_1 = RAMSTKMode()
+    _mode_1.revision_id = 1
+    _mode_1.hardware_id = 1
+    _mode_1.mode_id = 1
+    _mode_1.effect_local = ''
+    _mode_1.mission = 'Default Mission'
+    _mode_1.other_indications = ''
+    _mode_1.mode_criticality = 0.0
+    _mode_1.single_point = 0
+    _mode_1.design_provisions = ''
+    _mode_1.type_id = 0
+    _mode_1.rpn_severity_new = 1
+    _mode_1.effect_next = ''
+    _mode_1.detection_method = ''
+    _mode_1.operator_actions = ''
+    _mode_1.critical_item = 0
+    _mode_1.hazard_rate_source = ''
+    _mode_1.severity_class = ''
+    _mode_1.description = 'Test Failure Mode #1'
+    _mode_1.mission_phase = ''
+    _mode_1.mode_probability = ''
+    _mode_1.remarks = ''
+    _mode_1.mode_ratio = 0.0
+    _mode_1.mode_hazard_rate = 0.0
+    _mode_1.rpn_severity = 1
+    _mode_1.isolation_method = ''
+    _mode_1.effect_end = ''
+    _mode_1.mode_op_time = 0.0
+    _mode_1.effect_probability = 0.0
+
+    DAO = MockDAO()
+    DAO.table = [
+        _mode_1,
+    ]
+
+    yield DAO
+
+
 ATTRIBUTES = {
     'effect_local': '',
-    'mission': 'Default Mission',
+    'mission': 'Big Mission',
     'other_indications': '',
     'mode_criticality': 0.0,
     'single_point': 0,
@@ -29,7 +74,7 @@ ATTRIBUTES = {
     'critical_item': 0,
     'hazard_rate_source': '',
     'severity_class': '',
-    'description': 'Test Functional Failure Mode #1',
+    'description': 'Big Failure Mode',
     'mission_phase': '',
     'mode_probability': '',
     'remarks': '',
@@ -43,13 +88,13 @@ ATTRIBUTES = {
 }
 
 
-@pytest.mark.usefixtures('test_program_dao')
-class TestRAMSTKMode():
+@pytest.mark.usefixtures('mock_program_dao')
+class TestRAMSTKMode:
     """Class for testing the RAMSTKMode model."""
-    @pytest.mark.integration
-    def test_ramstkmode_create(self, test_program_dao):
-        """ __init__() should create an RAMSTKMode model. """
-        DUT = test_program_dao.session.query(RAMSTKMode).first()
+    @pytest.mark.unit
+    def test_ramstkmode_create(self, mock_program_dao):
+        """__init__() should create an RAMSTKMode model."""
+        DUT = mock_program_dao.do_select_all(RAMSTKMode)[0]
 
         assert isinstance(DUT, RAMSTKMode)
 
@@ -57,9 +102,9 @@ class TestRAMSTKMode():
         assert DUT.__tablename__ == 'ramstk_mode'
         assert DUT.revision_id == 1
         assert DUT.hardware_id == 1
-        assert DUT.mode_id == 6
+        assert DUT.mode_id == 1
         assert DUT.critical_item == 0
-        assert DUT.description == 'New Failure Mode'
+        assert DUT.description == 'Test Failure Mode #1'
         assert DUT.design_provisions == ''
         assert DUT.detection_method == ''
         assert DUT.effect_end == ''
@@ -84,17 +129,18 @@ class TestRAMSTKMode():
         assert DUT.single_point == 0
         assert DUT.type_id == 0
 
-    @pytest.mark.integration
-    def test_get_attributes(self, test_program_dao):
-        """ get_attributes() should return a dict of attribute name:value pairs. """
-        DUT = test_program_dao.session.query(RAMSTKMode).first()
+    @pytest.mark.unit
+    def test_get_attributes(self, mock_program_dao):
+        """get_attributes() should return a dict of attribute name:value
+        pairs."""
+        DUT = mock_program_dao.do_select_all(RAMSTKMode)[0]
 
         _attributes = DUT.get_attributes()
         assert _attributes['revision_id'] == 1
         assert _attributes['hardware_id'] == 1
-        assert _attributes['mode_id'] == 6
+        assert _attributes['mode_id'] == 1
         assert _attributes['critical_item'] == 0
-        assert _attributes['description'] == 'New Failure Mode'
+        assert _attributes['description'] == 'Test Failure Mode #1'
         assert _attributes['design_provisions'] == ''
         assert _attributes['detection_method'] == ''
         assert _attributes['effect_end'] == ''
@@ -119,27 +165,31 @@ class TestRAMSTKMode():
         assert _attributes['single_point'] == 0
         assert _attributes['type_id'] == 0
 
-    @pytest.mark.integration
-    def test_set_attributes(self, test_program_dao):
-        """ set_attributes() should return a zero error code on success. """
-        DUT = test_program_dao.session.query(RAMSTKMode).first()
+    @pytest.mark.unit
+    def test_set_attributes(self, mock_program_dao):
+        """set_attributes() should return a zero error code on success."""
+        DUT = mock_program_dao.do_select_all(RAMSTKMode)[0]
 
         assert DUT.set_attributes(ATTRIBUTES) is None
+        assert DUT.mission == 'Big Mission'
+        assert DUT.description == 'Big Failure Mode'
 
-    @pytest.mark.integration
-    def test_set_attributes_none_value(self, test_program_dao):
-        """set_attributes() should set an attribute to it's default value when the attribute is passed with a None value."""
-        DUT = test_program_dao.session.query(RAMSTKMode).first()
+    @pytest.mark.unit
+    def test_set_attributes_set_default(self, mock_program_dao):
+        """set_attributes() should set an attribute to it's default value when
+        the attribute is passed with a None value."""
+        DUT = mock_program_dao.do_select_all(RAMSTKMode)[0]
 
         ATTRIBUTES['description'] = None
 
         assert DUT.set_attributes(ATTRIBUTES) is None
         assert DUT.get_attributes()['description'] == ''
 
-    @pytest.mark.integration
-    def test_set_attributes_unknown_attributes(self, test_program_dao):
-        """set_attributes() should raise an AttributeError when passed an unknown attribute."""
-        DUT = test_program_dao.session.query(RAMSTKMode).first()
+    @pytest.mark.unit
+    def test_set_attributes_unknown_attributes(self, mock_program_dao):
+        """set_attributes() should raise an AttributeError when passed an
+        unknown attribute."""
+        DUT = mock_program_dao.do_select_all(RAMSTKMode)[0]
 
         with pytest.raises(AttributeError):
             DUT.set_attributes({'shibboly-bibbly-boo': 0.9998})

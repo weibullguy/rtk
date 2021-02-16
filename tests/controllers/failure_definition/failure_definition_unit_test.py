@@ -140,7 +140,7 @@ class TestSelectMethods:
         assert DUT.do_select(100, table='failure_definition') is None
 
 
-class TestDeleteMethods():
+class TestDeleteMethods:
     """Class for testing the data manager delete() method."""
     def on_succeed_delete_failure_definition(self, tree):
         assert isinstance(tree, Tree)
@@ -188,7 +188,7 @@ class TestDeleteMethods():
                         'fail_delete_failure_definition')
 
 
-class TestGetterSetter():
+class TestGetterSetter:
     """Class for testing methods that get or set."""
     def on_succeed_get_failure_definition_attrs(self, attributes):
         assert isinstance(attributes, dict)
@@ -250,8 +250,7 @@ class TestGetterSetter():
                         'succeed_get_failure_definition_tree')
 
 
-@pytest.mark.usefixtures('mock_program_dao')
-class TestInsertMethods():
+class TestInsertMethods:
     """Class for testing the data manager insert() method."""
     def on_succeed_insert_failure_definition(self, node_id, tree):
         assert node_id == 3
@@ -281,8 +280,7 @@ class TestInsertMethods():
                         'succeed_insert_failure_definition')
 
 
-@pytest.mark.usefixtures('mock_program_dao')
-class TestUpdateMethods():
+class TestUpdateMethods:
     """Class for testing update() and update_all() methods."""
     def on_fail_update_failure_definition_non_existent_id(self, error_message):
         assert error_message == (

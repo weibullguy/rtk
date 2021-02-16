@@ -553,53 +553,6 @@ MOCK_ENVIRONMENTS = {
     }
 }
 
-MOCK_FUNCTIONS = {
-    1: {
-        'availability_logistics': 1.0,
-        'availability_mission': 1.0,
-        'cost': 0.0,
-        'function_code': 'PRESS-001',
-        'hazard_rate_logistics': 0.0,
-        'hazard_rate_mission': 0.0,
-        'level': 0,
-        'mcmt': 0.0,
-        'mmt': 0.0,
-        'mpmt': 0.0,
-        'mtbf_logistics': 0.0,
-        'mtbf_mission': 0.0,
-        'mttr': 0.0,
-        'name': 'Function Name',
-        'parent_id': 0,
-        'remarks': '',
-        'safety_critical': 0,
-        'total_mode_count': 0,
-        'total_part_count': 0,
-        'type_id': 0
-    },
-    2: {
-        'availability_logistics': 1.0,
-        'availability_mission': 1.0,
-        'cost': 0.0,
-        'function_code': 'PRESS-001',
-        'hazard_rate_logistics': 0.0,
-        'hazard_rate_mission': 0.0,
-        'level': 0,
-        'mcmt': 0.0,
-        'mmt': 0.0,
-        'mpmt': 0.0,
-        'mtbf_logistics': 0.0,
-        'mtbf_mission': 0.0,
-        'mttr': 0.0,
-        'name': 'Function Name',
-        'parent_id': 0,
-        'remarks': '',
-        'safety_critical': 0,
-        'total_mode_count': 0,
-        'total_part_count': 0,
-        'type_id': 0
-    }
-}
-
 MOCK_HARDWARE = {
     1: {
         'alt_part_number': '',

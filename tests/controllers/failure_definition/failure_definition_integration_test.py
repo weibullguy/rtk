@@ -20,7 +20,7 @@ from ramstk.controllers import dmFailureDefinition
 @pytest.mark.usefixtures('test_program_dao')
 class TestInsertMethods:
     """Class to test data controller insert methods using actual database."""
-    def on_fail_insert_failure_definition(self, error_message):
+    def on_fail_insert_failure_definition_no_revision(self, error_message):
         assert error_message == (
             '_do_insert_failure_definition: Attempting to add failure '
             'definition to non-existent revision 40.')
@@ -31,7 +31,7 @@ class TestInsertMethods:
         """do_insert() should send the fail_insert_failure_definition message
         when attempting to insert a new failure definition with a non-existent
         revision ID."""
-        pub.subscribe(self.on_fail_insert_failure_definition,
+        pub.subscribe(self.on_fail_insert_failure_definition_no_revision,
                       'fail_insert_failure_definition')
 
         DUT = dmFailureDefinition()
@@ -40,7 +40,7 @@ class TestInsertMethods:
         DUT._revision_id = 40
         DUT._do_insert_failure_definition()
 
-        pub.unsubscribe(self.on_fail_insert_failure_definition,
+        pub.unsubscribe(self.on_fail_insert_failure_definition_no_revision,
                         'fail_insert_failure_definition')
 
 

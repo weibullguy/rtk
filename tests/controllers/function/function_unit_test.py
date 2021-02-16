@@ -2,79 +2,86 @@
 # type: ignore
 # -*- coding: utf-8 -*-
 #
-#       tests.controllers.test_function.py is part of The RAMSTK Project
+#       tests.controllers.function.function_unit_test.py is part of The RAMSTK
+#       Project
 #
 # All rights reserved.
-# Copyright 2007 - 2019 Doyle Rowland doyle.rowland <AT> reliaqual <DOT> com
-"""Test class for testing Function algorithms and models."""
+# Copyright 2007 - 2021 Doyle Rowland doyle.rowland <AT> reliaqual <DOT> com
+"""Test class for testing function module algorithms and models."""
 
 # Third Party Imports
 import pytest
-from __mocks__ import MOCK_FUNCTIONS, MOCK_HRDWR_TREE, MOCK_RQRMNT_TREE
+# noinspection PyUnresolvedReferences
+from mocks import MockDAO
 from pubsub import pub
 from treelib import Tree
 
 # RAMSTK Package Imports
-from ramstk.controllers import dmFunction, dmHardware
+from ramstk.controllers import dmFunction
 from ramstk.db.base import BaseDatabase
-from ramstk.exceptions import DataAccessError
 from ramstk.models.programdb import RAMSTKFunction
-
-
-class MockDao:
-    _all_functions = []
-
-    def _do_delete_function(self, record):
-        for _idx, _record in enumerate(self._all_functions):
-            if _record.function_id == record.function_id:
-                self._all_functions.pop(_idx)
-
-    def do_delete(self, record):
-        try:
-            self._do_delete_function(record)
-        except AttributeError:
-            raise DataAccessError('An error occurred with RAMSTK.')
-
-    def do_insert(self, record):
-        if record.parent_id == 30:
-            raise DataAccessError('An error occurred with RAMSTK.')
-        else:
-            self._all_functions.append(record)
-
-    def do_select_all(self,
-                      table,
-                      key=None,
-                      value=None,
-                      order=None,
-                      _all=False):
-        self._all_functions = []
-        if table == RAMSTKFunction:
-            for _key in MOCK_FUNCTIONS:
-                _record = table()
-                _record.revision_id = value
-                _record.function_id = _key
-                _record.set_attributes(MOCK_FUNCTIONS[_key])
-                self._all_functions.append(_record)
-
-        return self._all_functions
-
-    def do_update(self, record):
-        for _key in MOCK_FUNCTIONS:
-            if _key == record.function_id:
-                MOCK_FUNCTIONS[_key]['name'] = str(record.name)
-                MOCK_FUNCTIONS[_key]['cost'] = float(record.cost)
-
-    def get_last_id(self, table, id_column):
-        return max(MOCK_FUNCTIONS.keys())
 
 
 @pytest.fixture
 def mock_program_dao(monkeypatch):
-    yield MockDao()
+    _function_1 = RAMSTKFunction()
+    _function_1.revision_id = 1
+    _function_1.function_id = 1
+    _function_1.availability_logistics = 1.0
+    _function_1.availability_mission = 1.0
+    _function_1.cost = 0.0
+    _function_1.function_code = 'PRESS-001'
+    _function_1.hazard_rate_logistics = 0.0
+    _function_1.hazard_rate_mission = 0.0
+    _function_1.level = 0
+    _function_1.mcmt = 0.0
+    _function_1.mmt = 0.0
+    _function_1.mpmt = 0.0
+    _function_1.mtbf_logistics = 0.0
+    _function_1.mtbf_mission = 0.0
+    _function_1.mttr = 0.0
+    _function_1.name = 'Function Name'
+    _function_1.parent_id = 0
+    _function_1.remarks = ''
+    _function_1.safety_critical = 0
+    _function_1.total_mode_count = 0
+    _function_1.total_part_count = 0
+    _function_1.type_id = 0
+
+    _function_2 = RAMSTKFunction()
+    _function_2.revision_id = 1
+    _function_2.function_id = 2
+    _function_2.availability_logistics = 1.0
+    _function_2.availability_mission = 1.0
+    _function_2.cost = 0.0
+    _function_2.function_code = 'PRESS-001'
+    _function_2.hazard_rate_logistics = 0.0
+    _function_2.hazard_rate_mission = 0.0
+    _function_2.level = 0
+    _function_2.mcmt = 0.0
+    _function_2.mmt = 0.0
+    _function_2.mpmt = 0.0
+    _function_2.mtbf_logistics = 0.0
+    _function_2.mtbf_mission = 0.0
+    _function_2.mttr = 0.0
+    _function_2.name = 'Function Name'
+    _function_2.parent_id = 0
+    _function_2.remarks = ''
+    _function_2.safety_critical = 0
+    _function_2.total_mode_count = 0
+    _function_2.total_part_count = 0
+    _function_2.type_id = 0
+
+    DAO = MockDAO()
+    DAO.table = [
+        _function_1,
+        _function_2,
+    ]
+
+    yield DAO
 
 
-@pytest.mark.usefixtures('test_toml_user_configuration')
-class TestCreateControllers():
+class TestCreateControllers:
     """Class for controller initialization test suite."""
     @pytest.mark.unit
     def test_data_manager_create(self):
@@ -101,7 +108,7 @@ class TestCreateControllers():
                                 'request_insert_function')
 
 
-class TestSelectMethods():
+class TestSelectMethods:
     """Class for testing data manager select_all() and select() methods."""
     def on_succeed_retrieve_functions(self, tree):
         assert isinstance(tree, Tree)
@@ -158,7 +165,7 @@ class TestSelectMethods():
         assert DUT.do_select(100, table='function') is None
 
 
-class TestDeleteMethods():
+class TestDeleteMethods:
     """Class for testing the data manager delete() method."""
     def on_succeed_delete_function(self, tree):
         assert isinstance(tree, Tree)
@@ -221,87 +228,7 @@ class TestDeleteMethods():
                         'fail_delete_function')
 
 
-class TestInsertMethods():
-    """Class for testing the data manager insert() method."""
-    def on_succeed_insert_function(self, node_id, tree):
-        assert node_id == 3
-        assert isinstance(tree, Tree)
-        print("\033[36m\nsucceed_insert_function topic was broadcast.")
-
-    def on_fail_insert_function_no_parent(self, error_message):
-        assert error_message == ('_do_insert_function: Attempted to insert '
-                                 'child function under non-existent function ID 40.')
-        print("\033[35m\nfail_insert_function topic was broadcast.")
-
-    def on_fail_insert_function_db_error(self, error_message):
-        assert error_message == ('An error occurred with RAMSTK.')
-        print("\033[35m\nfail_insert_function topic was broadcast.")
-
-    @pytest.mark.unit
-    def test_do_insert_sibling_function(self, mock_program_dao):
-        """_do_insert_function() should send the success message after
-        successfully inserting a sibling function."""
-        pub.subscribe(self.on_succeed_insert_function,
-                      'succeed_insert_function')
-
-        DUT = dmFunction()
-        DUT.do_connect(mock_program_dao)
-        DUT.do_select_all(attributes={'revision_id': 1})
-        DUT._do_insert_function()
-
-        assert isinstance(
-            DUT.tree.get_node(3).data['function'], RAMSTKFunction)
-        assert DUT.tree.get_node(3).data['function'].function_id == 3
-        assert DUT.tree.get_node(3).data['function'].name == 'New Function'
-
-        pub.unsubscribe(self.on_succeed_insert_function,
-                        'succeed_insert_function')
-
-    @pytest.mark.unit
-    def test_do_insert_child_function(self, mock_program_dao):
-        """_do_insert_function() should send the success message after
-        successfully inserting a child function."""
-        DUT = dmFunction()
-        DUT.do_connect(mock_program_dao)
-        DUT.do_select_all(attributes={'revision_id': 1})
-        DUT._do_insert_function(parent_id=2)
-
-        assert isinstance(
-            DUT.tree.get_node(3).data['function'], RAMSTKFunction)
-        assert DUT.tree.get_node(3).data['function'].function_id == 3
-        assert DUT.tree.get_node(3).data['function'].name == 'New Function'
-
-    @pytest.mark.unit
-    def test_do_insert_function_no_parent(self, mock_program_dao):
-        """_do_insert_function() should send the fail message if attempting to
-        add a function to a non-existent parent ID."""
-        pub.subscribe(self.on_fail_insert_function_no_parent,
-                      'fail_insert_function')
-
-        DUT = dmFunction()
-        DUT.do_connect(mock_program_dao)
-        DUT.do_select_all(attributes={'revision_id': 1})
-        DUT._do_insert_function(parent_id=40)
-
-        pub.unsubscribe(self.on_fail_insert_function_no_parent,
-                        'fail_insert_function')
-
-    @pytest.mark.unit
-    def test_do_insert_function_database_error(self, mock_program_dao):
-        """_do_insert_function() should send the fail message if attempting to
-        add a function to a non-existent parent ID."""
-        pub.subscribe(self.on_fail_insert_function_db_error,
-                      'fail_insert_function')
-
-        DUT = dmFunction()
-        DUT.do_connect(mock_program_dao)
-        DUT.do_select_all(attributes={'revision_id': 1})
-        DUT._do_insert_function(parent_id=30)
-
-        pub.unsubscribe(self.on_fail_insert_function_db_error, 'fail_insert_function')
-
-@pytest.mark.usefixtures('test_toml_user_configuration')
-class TestGetterSetter():
+class TestGetterSetter:
     """Class for testing methods that get or set."""
     def on_succeed_get_function_attrs(self, attributes):
         assert isinstance(attributes, dict)
@@ -316,7 +243,7 @@ class TestGetterSetter():
         print("\033[36m\nsucceed_get_function_tree topic was broadcast")
 
     @pytest.mark.unit
-    def test_do_get_attributes_function(self, mock_program_dao):
+    def test_do_get_attributes(self, mock_program_dao):
         """_do_get_attributes() should return a dict of function attributes on
         success."""
         pub.subscribe(self.on_succeed_get_function_attrs,
@@ -339,31 +266,6 @@ class TestGetterSetter():
                         package={'function_code': '-'})
         assert DUT.do_select(1, table='function').function_code == '-'
 
-    @pytest.mark.skip
-    def test_do_set_all_attributes(self, mock_program_dao):
-        """do_set_all_attributes() should send the success message."""
-        DUT = dmFunction()
-        DUT.do_connect(mock_program_dao)
-        DUT.do_select_all(attributes={'revision_id': 1})
-
-        pub.sendMessage('request_set_all_function_attributes',
-                        attributes={
-                            'function_id': 1,
-                            'function_code': '1',
-                            'remarks': 'These are remarks added by a test.',
-                        })
-        assert DUT.do_select(1, table='function').function_code == '1'
-        assert DUT.do_select(
-            1,
-            table='function').remarks == 'These are remarks added by a test.'
-
-        pub.sendMessage('request_set_all_function_attributes',
-                        attributes={
-                            'function_id': 1,
-                            'function_code': '',
-                            'remarks': '',
-                        })
-
     @pytest.mark.unit
     def test_on_get_tree_data_manager(self, mock_program_dao):
         """on_get_tree() should return the function treelib Tree."""
@@ -379,82 +281,118 @@ class TestGetterSetter():
                         'succeed_get_function_tree')
 
 
-class TestUpdateMethods():
-    """Class for testing update() and update_all() methods."""
-    def on_succeed_update_function(self, tree):
+class TestInsertMethods:
+    """Class for testing the data manager insert() method."""
+    def on_succeed_insert_sibling_function(self, node_id, tree):
+        assert node_id == 3
         assert isinstance(tree, Tree)
-        print("\033[36m\nsucceed_update_function topic was broadcast")
+        print("\033[36m\nsucceed_insert_function topic was broadcast.")
 
-    def on_fail_update_function(self, error_message):
+    def on_succeed_insert_child_function(self, node_id, tree):
+        assert node_id == 3
+        assert isinstance(tree, Tree)
+        assert tree.get_node(3).data['function'].parent_id == 2
+        print("\033[36m\nsucceed_insert_function topic was broadcast.")
+
+    def on_fail_insert_function_no_parent(self, error_message):
         assert error_message == (
-            'do_update: Attempted to save non-existent function with function ID 100.')
-        print("\033[35m\nfail_update_function topic was broadcast")
-
-    def on_fail_update_function_no_data(self, error_message):
-        assert error_message == ('do_update: The value for one or more attributes for function ID 1 was the wrong type.')
-        print("\033[35m\nfail_update_function topic was broadcast")
+            '_do_insert_function: Attempted to insert '
+            'child function under non-existent function ID 40.')
+        print("\033[35m\nfail_insert_function topic was broadcast.")
 
     @pytest.mark.unit
-    def test_do_update_data_manager(self, mock_program_dao):
-        """do_update() should return a zero error code on success."""
-        pub.subscribe(self.on_succeed_update_function,
-                      'succeed_update_function')
+    def test_do_insert_sibling_function(self, mock_program_dao):
+        """_do_insert_function() should send the success message after
+        successfully inserting a sibling function."""
+        pub.subscribe(self.on_succeed_insert_sibling_function,
+                      'succeed_insert_function')
 
         DUT = dmFunction()
         DUT.do_connect(mock_program_dao)
         DUT.do_select_all(attributes={'revision_id': 1})
+        DUT._do_insert_function()
 
-        DUT.tree.get_node(1).data['function'].name = 'Test Function'
-        DUT.do_update(1)
+        assert isinstance(
+            DUT.tree.get_node(3).data['function'], RAMSTKFunction)
+        assert DUT.tree.get_node(3).data['function'].function_id == 3
+        assert DUT.tree.get_node(3).data['function'].name == 'New Function'
 
+        pub.unsubscribe(self.on_succeed_insert_sibling_function,
+                        'succeed_insert_function')
+
+    @pytest.mark.unit
+    def test_do_insert_child_function(self, mock_program_dao):
+        """_do_insert_function() should send the success message after
+        successfully inserting a child function."""
+        DUT = dmFunction()
+        DUT.do_connect(mock_program_dao)
         DUT.do_select_all(attributes={'revision_id': 1})
-        assert DUT.tree.get_node(1).data['function'].name == 'Test Function'
+        DUT._do_insert_function(parent_id=2)
 
-        pub.unsubscribe(self.on_succeed_update_function,
-                        'succeed_update_function')
+        assert isinstance(
+            DUT.tree.get_node(3).data['function'], RAMSTKFunction)
+        assert DUT.tree.get_node(3).data['function'].function_id == 3
+        assert DUT.tree.get_node(3).data['function'].name == 'New Function'
+
+    @pytest.mark.unit
+    def test_do_insert_function_no_revision(self, mock_program_dao):
+        """_do_insert_function() should send the fail message if attempting to
+        add a function to a non-existent parent ID."""
+        pub.subscribe(self.on_fail_insert_function_no_parent,
+                      'fail_insert_function')
+
+        DUT = dmFunction()
+        DUT.do_connect(mock_program_dao)
+        DUT.do_select_all(attributes={'revision_id': 1})
+        DUT._do_insert_function(parent_id=40)
+
+        pub.unsubscribe(self.on_fail_insert_function_no_parent,
+                        'fail_insert_function')
+
+
+class TestUpdateMethods:
+    """Class for testing update() and update_all() methods."""
+    def on_fail_update_function_non_existent_id(self, error_message):
+        assert error_message == (
+            'do_update: Attempted to save non-existent function with function '
+            'ID 100.')
+        print("\033[35m\nfail_update_function topic was broadcast")
+
+    def on_fail_update_function_no_data_package(self, error_message):
+        assert error_message == (
+            'do_update: The value for one or more attributes for function ID '
+            '1 was the wrong type.'
+        )
+        print("\033[35m\nfail_update_function topic was broadcast")
 
     @pytest.mark.unit
     def test_do_update_non_existent_id(self, mock_program_dao):
         """do_update() should return a non-zero error code when passed a
         Function ID that doesn't exist."""
-        pub.subscribe(self.on_fail_update_function, 'fail_update_function')
+        pub.subscribe(self.on_fail_update_function_non_existent_id,
+                      'fail_update_function')
 
         DUT = dmFunction()
         DUT.do_connect(mock_program_dao)
         DUT.do_select_all(attributes={'revision_id': 1})
         DUT.do_update(100)
 
-        pub.unsubscribe(self.on_fail_update_function, 'fail_update_function')
-
-    @pytest.mark.unit
-    def test_do_update_wrong_data_type(self, mock_program_dao):
-        """do_update() should return a non-zero error code when passed a
-        Function ID that has no data package."""
-        pub.subscribe(self.on_fail_update_function_no_data,
-                      'fail_update_function')
-
-        DUT = dmFunction()
-        DUT.do_connect(mock_program_dao)
-        DUT.do_select_all(attributes={'revision_id': 1})
-        DUT.tree.get_node(1).data['function'].cost = None
-
-        DUT.do_update(1)
-
-        pub.unsubscribe(self.on_fail_update_function_no_data,
+        pub.unsubscribe(self.on_fail_update_function_non_existent_id,
                         'fail_update_function')
 
     @pytest.mark.unit
-    def test_do_update_root_node(self, mock_program_dao):
+    def test_do_update_no_data_package(self, mock_program_dao):
         """do_update() should return a non-zero error code when passed a
         Function ID that has no data package."""
-        pub.subscribe(self.on_fail_update_function_no_data,
+        pub.subscribe(self.on_fail_update_function_no_data_package,
                       'fail_update_function')
 
         DUT = dmFunction()
         DUT.do_connect(mock_program_dao)
         DUT.do_select_all(attributes={'revision_id': 1})
+        DUT.tree.get_node(1).data.pop('function')
 
-        DUT.do_update(0)
+        DUT.do_update(1)
 
-        pub.unsubscribe(self.on_fail_update_function_no_data,
+        pub.unsubscribe(self.on_fail_update_function_no_data_package,
                         'fail_update_function')

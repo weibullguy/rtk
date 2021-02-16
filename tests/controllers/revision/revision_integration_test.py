@@ -23,6 +23,7 @@ class TestUpdateMethods:
     """Class to test data controller update methods using actual database."""
     def on_succeed_update_revision(self, tree):
         assert isinstance(tree, Tree)
+        assert tree.get_node(1).data['revision'].name == 'Test Revision'
         print("\033[36m\nsucceed_update_revision topic was broadcast")
 
     def on_fail_update_revision_wrong_data_type(self, error_message):
@@ -45,11 +46,6 @@ class TestUpdateMethods:
         _revision = DUT.do_select(1, table='revision')
         _revision.name = 'Test Revision'
         DUT.do_update(1)
-
-        DUT.do_select_all()
-        _revision = DUT.do_select(1, table='revision')
-
-        assert _revision.name == 'Test Revision'
 
         pub.unsubscribe(self.on_succeed_update_revision,
                         'succeed_update_revision')

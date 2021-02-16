@@ -2,17 +2,89 @@
 # type: ignore
 # -*- coding: utf-8 -*-
 #
-#       tests.models.programdb.test_ramstksimilaritem.py is part of The RAMSTK
-#       Project
+#       tests.models.programdb.ramstksimilaritem_unit_test.py is part of The
+#       RAMSTK Project
 #
 # All rights reserved.
-"""Test class for testing RAMSTKSimilarItem module algorithms and models."""
+# Copyright 2007 - 2021 Doyle Rowland doyle.rowland <AT> reliaqual <DOT> com
+"""Class for testing RAMSTKSimilarItem module algorithms and models."""
 
 # Third Party Imports
+# noinspection PyPackageRequirements
 import pytest
+# noinspection PyUnresolvedReferences
+from mocks import MockDAO
 
 # RAMSTK Package Imports
 from ramstk.models.programdb import RAMSTKSimilarItem
+
+
+@pytest.fixture
+def mock_program_dao(monkeypatch):
+    _similar_item_1 = RAMSTKSimilarItem()
+    _similar_item_1.revision_id = 1
+    _similar_item_1.hardware_id = 1
+    _similar_item_1.similar_item_method_id = 1
+    _similar_item_1.quality_to_id = 0
+    _similar_item_1.parent_id = 0
+    _similar_item_1.change_factor_4 = 1.0
+    _similar_item_1.change_factor_5 = 1.0
+    _similar_item_1.change_factor_6 = 1.0
+    _similar_item_1.change_factor_7 = 1.0
+    _similar_item_1.change_factor_1 = 1.0
+    _similar_item_1.change_factor_2 = 1.0
+    _similar_item_1.change_factor_3 = 1.0
+    _similar_item_1.change_factor_8 = 1.0
+    _similar_item_1.change_factor_9 = 1.0
+    _similar_item_1.function_5 = '0'
+    _similar_item_1.function_4 = '0'
+    _similar_item_1.function_3 = '0'
+    _similar_item_1.function_2 = '0'
+    _similar_item_1.function_1 = '0'
+    _similar_item_1.quality_from_id = 0
+    _similar_item_1.change_factor_10 = 1.0
+    _similar_item_1.user_blob_3 = ''
+    _similar_item_1.environment_from_id = 0
+    _similar_item_1.change_description_7 = ''
+    _similar_item_1.environment_to_id = 0
+    _similar_item_1.result_3 = 0.0
+    _similar_item_1.temperature_to = 30.0
+    _similar_item_1.user_blob_2 = ''
+    _similar_item_1.user_blob_1 = ''
+    _similar_item_1.user_blob_5 = ''
+    _similar_item_1.user_blob_4 = ''
+    _similar_item_1.result_2 = 0.0
+    _similar_item_1.change_description_10 = ''
+    _similar_item_1.result_1 = 0.0
+    _similar_item_1.result_4 = 0.0
+    _similar_item_1.result_5 = 0.0
+    _similar_item_1.user_float_5 = 0.0
+    _similar_item_1.user_float_4 = 0.0
+    _similar_item_1.user_float_3 = 0.0
+    _similar_item_1.user_float_2 = 0.0
+    _similar_item_1.user_float_1 = 0.0
+    _similar_item_1.user_int_4 = 0
+    _similar_item_1.user_int_5 = 0
+    _similar_item_1.user_int_1 = 0
+    _similar_item_1.user_int_2 = 0
+    _similar_item_1.user_int_3 = 0
+    _similar_item_1.change_description_6 = ''
+    _similar_item_1.temperature_from = 30.0
+    _similar_item_1.change_description_4 = ''
+    _similar_item_1.change_description_5 = ''
+    _similar_item_1.change_description_2 = ''
+    _similar_item_1.change_description_3 = ''
+    _similar_item_1.change_description_1 = ''
+    _similar_item_1.change_description_8 = ''
+    _similar_item_1.change_description_9 = ''
+
+    DAO = MockDAO()
+    DAO.table = [
+        _similar_item_1,
+    ]
+
+    yield DAO
+
 
 ATTRIBUTES = {
     'similar_item_method_id': 0,
@@ -71,17 +143,15 @@ ATTRIBUTES = {
 }
 
 
-@pytest.mark.usefixtures('test_program_dao')
-class TestRAMSTKSimilarItem():
+@pytest.mark.usefixtures('mock_program_dao')
+class TestRAMSTKSimilarItem:
     """Class for testing the RAMSTKSimilarItem model."""
-    @pytest.mark.integration
-    def test_ramstksimilaritem_create(self, test_program_dao):
+    @pytest.mark.unit
+    def test_ramstksimilaritem_create(self, mock_program_dao):
         """__init__() should create an RAMSTKSimilarItem model."""
-        DUT = test_program_dao.session.query(RAMSTKSimilarItem).first()
+        DUT = mock_program_dao.do_select_all(RAMSTKSimilarItem)[0]
 
         assert isinstance(DUT, RAMSTKSimilarItem)
-
-        # Verify class attributes are properly initialized.
         assert DUT.__tablename__ == 'ramstk_similar_item'
         assert DUT.revision_id == 1
         assert DUT.hardware_id == 1
@@ -139,10 +209,10 @@ class TestRAMSTKSimilarItem():
         assert DUT.user_int_4 == 0
         assert DUT.user_int_5 == 0
 
-    @pytest.mark.integration
-    def test_get_attributes(self, test_program_dao):
+    @pytest.mark.unit
+    def test_get_attributes(self, mock_program_dao):
         """get_attributes() should return a dict of attribute values."""
-        DUT = test_program_dao.session.query(RAMSTKSimilarItem).first()
+        DUT = mock_program_dao.do_select_all(RAMSTKSimilarItem)[0]
 
         _attributes = DUT.get_attributes()
 
@@ -203,27 +273,29 @@ class TestRAMSTKSimilarItem():
         assert _attributes['user_int_4'] == 0
         assert _attributes['user_int_5'] == 0
 
-    @pytest.mark.integration
-    def test_set_attributes(self, test_program_dao):
+    @pytest.mark.unit
+    def test_set_attributes(self, mock_program_dao):
         """set_attributes() should return None on success."""
-        DUT = test_program_dao.session.query(RAMSTKSimilarItem).first()
+        DUT = mock_program_dao.do_select_all(RAMSTKSimilarItem)[0]
 
         assert DUT.set_attributes(ATTRIBUTES) is None
 
-    @pytest.mark.integration
-    def test_set_attributes_none_value(self, test_program_dao):
-        """set_attributes() should set an attribute to it's default value when the attribute is passed with a None value."""
-        DUT = test_program_dao.session.query(RAMSTKSimilarItem).first()
+    @pytest.mark.unit
+    def test_set_attributes_none_value(self, mock_program_dao):
+        """set_attributes() should set an attribute to it's default value when
+        the attribute is passed with a None value."""
+        DUT = mock_program_dao.do_select_all(RAMSTKSimilarItem)[0]
 
         ATTRIBUTES['change_factor_3'] = None
 
         assert DUT.set_attributes(ATTRIBUTES) is None
         assert DUT.get_attributes()['change_factor_3'] == 1.0
 
-    @pytest.mark.integration
-    def test_set_attributes_unknown_attributes(self, test_program_dao):
-        """set_attributes() should raise an AttributeError when passed an unknown attribute."""
-        DUT = test_program_dao.session.query(RAMSTKSimilarItem).first()
+    @pytest.mark.unit
+    def test_set_attributes_unknown_attributes(self, mock_program_dao):
+        """set_attributes() should raise an AttributeError when passed an
+        unknown attribute."""
+        DUT = mock_program_dao.do_select_all(RAMSTKSimilarItem)[0]
 
         with pytest.raises(AttributeError):
             DUT.set_attributes({'shibboly-bibbly-boo': 0.9998})

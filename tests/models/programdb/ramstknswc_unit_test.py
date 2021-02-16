@@ -2,17 +2,93 @@
 # type: ignore
 # -*- coding: utf-8 -*-
 #
-#       tests.models.programdb.test_ramstknswc.py is part of The RAMSTK
+#       tests.models.programdb.ramstknswc_unit_test.py is part of The RAMSTK
 #       Project
 #
 # All rights reserved.
-"""Test class for testing the RAMSTKNSWC module algorithms and models. """
+# Copyright 2007 - 2021 Doyle Rowland doyle.rowland <AT> reliaqual <DOT> com
+"""Class for testing the RAMSTKNSWC module algorithms and models."""
 
 # Third Party Imports
+# noinspection PyPackageRequirements
 import pytest
+# noinspection PyUnresolvedReferences
+from mocks import MockDAO
 
 # RAMSTK Package Imports
 from ramstk.models.programdb import RAMSTKNSWC
+
+
+@pytest.fixture
+def mock_program_dao(monkeypatch):
+    _nswc_1 = RAMSTKNSWC()
+    _nswc_1.revision_id = 1
+    _nswc_1.hardware_id = 1
+    _nswc_1.Clc = 0.0
+    _nswc_1.Crd = 0.0
+    _nswc_1.Cac = 0.0
+    _nswc_1.Cmu = 0.0
+    _nswc_1.Ck = 0.0
+    _nswc_1.Ci = 0.0
+    _nswc_1.Ch = 0.0
+    _nswc_1.Cn = 0.0
+    _nswc_1.Cm = 0.0
+    _nswc_1.Cl = 0.0
+    _nswc_1.Cc = 0.0
+    _nswc_1.Cb = 0.0
+    _nswc_1.Cg = 0.0
+    _nswc_1.Cf = 0.0
+    _nswc_1.Ce = 0.0
+    _nswc_1.Cd = 0.0
+    _nswc_1.Cy = 0.0
+    _nswc_1.Cbv = 0.0
+    _nswc_1.Cbt = 0.0
+    _nswc_1.Cs = 0.0
+    _nswc_1.Cr = 0.0
+    _nswc_1.Cq = 0.0
+    _nswc_1.Cp = 0.0
+    _nswc_1.Cw = 0.0
+    _nswc_1.Cv = 0.0
+    _nswc_1.Ct = 0.0
+    _nswc_1.Cnw = 0.0
+    _nswc_1.Cnp = 0.0
+    _nswc_1.Csf = 0.0
+    _nswc_1.Calt = 0.0
+    _nswc_1.Csc = 0.0
+    _nswc_1.Cbl = 0.0
+    _nswc_1.Csz = 0.0
+    _nswc_1.Cst = 0.0
+    _nswc_1.Csw = 0.0
+    _nswc_1.Csv = 0.0
+    _nswc_1.Cgl = 0.0
+    _nswc_1.Cga = 0.0
+    _nswc_1.Cgp = 0.0
+    _nswc_1.Cgs = 0.0
+    _nswc_1.Cgt = 0.0
+    _nswc_1.Cgv = 0.0
+    _nswc_1.Ccw = 0.0
+    _nswc_1.Ccv = 0.0
+    _nswc_1.Cpd = 0.0
+    _nswc_1.Ccp = 0.0
+    _nswc_1.Cpf = 0.0
+    _nswc_1.Ccs = 0.0
+    _nswc_1.Ccf = 0.0
+    _nswc_1.Cpv = 0.0
+    _nswc_1.Cdc = 0.0
+    _nswc_1.Cdl = 0.0
+    _nswc_1.Cdt = 0.0
+    _nswc_1.Cdw = 0.0
+    _nswc_1.Cdp = 0.0
+    _nswc_1.Cds = 0.0
+    _nswc_1.Cdy = 0.0
+
+    DAO = MockDAO()
+    DAO.table = [
+        _nswc_1,
+    ]
+
+    yield DAO
+
 
 ATTRIBUTES = {
     'Clc': 0.0,
@@ -75,13 +151,13 @@ ATTRIBUTES = {
 }
 
 
-@pytest.mark.usefixtures('test_program_dao')
-class TestRAMSTKNSWC():
+@pytest.mark.usefixtures('mock_program_dao')
+class TestRAMSTKNSWC:
     """Class for testing the RAMSTKNSWC model."""
-    @pytest.mark.integration
-    def test_ramstknswc_create(self, test_program_dao):
-        """ __init__() should create an RAMSTKNSWC model. """
-        DUT = test_program_dao.session.query(RAMSTKNSWC).first()
+    @pytest.mark.unit
+    def test_ramstknswc_create(self, mock_program_dao):
+        """__init__() should create an RAMSTKNSWC model."""
+        DUT = mock_program_dao.do_select_all(RAMSTKNSWC)[0]
 
         assert isinstance(DUT, RAMSTKNSWC)
 
@@ -146,10 +222,10 @@ class TestRAMSTKNSWC():
         assert DUT.Cw == 0.0
         assert DUT.Cy == 0.0
 
-    @pytest.mark.integration
-    def test_get_attributes(self, test_program_dao):
-        """ get_attributes() should return a tuple of attribute values. """
-        DUT = test_program_dao.session.query(RAMSTKNSWC).first()
+    @pytest.mark.unit
+    def test_get_attributes(self, mock_program_dao):
+        """get_attributes() should return a tuple of attribute values."""
+        DUT = mock_program_dao.do_select_all(RAMSTKNSWC)[0]
 
         _attributes = DUT.get_attributes()
 
@@ -212,27 +288,29 @@ class TestRAMSTKNSWC():
         assert _attributes['Cds'] == 0.0
         assert _attributes['Cdy'] == 0.0
 
-    @pytest.mark.integration
-    def test_set_attributes(self, test_program_dao):
-        """ set_attributes() should return a zero error code on success. """
-        DUT = test_program_dao.session.query(RAMSTKNSWC).first()
+    @pytest.mark.unit
+    def test_set_attributes(self, mock_program_dao):
+        """set_attributes() should return a zero error code on success."""
+        DUT = mock_program_dao.do_select_all(RAMSTKNSWC)[0]
 
         assert DUT.set_attributes(ATTRIBUTES) is None
 
-    @pytest.mark.integration
-    def test_set_attributes_none_value(self, test_program_dao):
-        """set_attributes() should set an attribute to it's default value when the attribute is passed with a None value."""
-        DUT = test_program_dao.session.query(RAMSTKNSWC).first()
+    @pytest.mark.unit
+    def test_set_attributes_none_value(self, mock_program_dao):
+        """set_attributes() should set an attribute to it's default value when
+        the attribute is passed with a None value."""
+        DUT = mock_program_dao.do_select_all(RAMSTKNSWC)[0]
 
         ATTRIBUTES['Cpv'] = None
 
         assert DUT.set_attributes(ATTRIBUTES) is None
         assert DUT.get_attributes()['Cpv'] == 0.0
 
-    @pytest.mark.integration
-    def test_set_attributes_unknown_attributes(self, test_program_dao):
-        """set_attributes() should raise an AttributeError when passed an unknown attribute."""
-        DUT = test_program_dao.session.query(RAMSTKNSWC).first()
+    @pytest.mark.unit
+    def test_set_attributes_unknown_attributes(self, mock_program_dao):
+        """set_attributes() should raise an AttributeError when passed an
+        unknown attribute."""
+        DUT = mock_program_dao.do_select_all(RAMSTKNSWC)[0]
 
         with pytest.raises(AttributeError):
             DUT.set_attributes({'shibboly-bibbly-boo': 0.9998})

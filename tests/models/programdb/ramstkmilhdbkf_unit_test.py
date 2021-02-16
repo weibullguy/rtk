@@ -2,17 +2,71 @@
 # type: ignore
 # -*- coding: utf-8 -*-
 #
-#       tests.models.programdb.test_ramstkmilhdbkf.py is part of The RAMSTK
-#       Project
+#       tests.models.programdb.ramstkmilhdbkf_unit_test.py is part of The
+#       RAMSTK Project
 #
 # All rights reserved.
-"""Test class for testing the RAMSTKMilHdbkF module algorithms and models. """
+# Copyright 2007 - 2021 Doyle Rowland doyle.rowland <AT> reliaqual <DOT> com
+"""Class for testing the RAMSTKMilHdbkF module algorithms and models."""
 
 # Third Party Imports
+# noinspection PyPackageRequirements
 import pytest
+# noinspection PyUnresolvedReferences
+from mocks import MockDAO
 
 # RAMSTK Package Imports
 from ramstk.models.programdb import RAMSTKMilHdbkF
+
+
+@pytest.fixture
+def mock_program_dao(monkeypatch):
+    _mil_hdbk_f_1 = RAMSTKMilHdbkF()
+    _mil_hdbk_f_1.revision_id = 1
+    _mil_hdbk_f_1.hardware_id = 1
+    _mil_hdbk_f_1.A1 = 0.0
+    _mil_hdbk_f_1.A2 = 0.0
+    _mil_hdbk_f_1.B1 = 0.0
+    _mil_hdbk_f_1.B2 = 0.0
+    _mil_hdbk_f_1.C1 = 0.0
+    _mil_hdbk_f_1.C2 = 0.0
+    _mil_hdbk_f_1.lambdaBD = 0.0
+    _mil_hdbk_f_1.lambdaBP = 0.0
+    _mil_hdbk_f_1.lambdaCYC = 0.0
+    _mil_hdbk_f_1.lambdaEOS = 0.0
+    _mil_hdbk_f_1.piA = 0.0
+    _mil_hdbk_f_1.piC = 0.0
+    _mil_hdbk_f_1.piCD = 0.0
+    _mil_hdbk_f_1.piCF = 0.0
+    _mil_hdbk_f_1.piCR = 0.0
+    _mil_hdbk_f_1.piCV = 0.0
+    _mil_hdbk_f_1.piCYC = 0.0
+    _mil_hdbk_f_1.piE = 0.0
+    _mil_hdbk_f_1.piF = 0.0
+    _mil_hdbk_f_1.piI = 0.0
+    _mil_hdbk_f_1.piK = 0.0
+    _mil_hdbk_f_1.piL = 0.0
+    _mil_hdbk_f_1.piM = 0.0
+    _mil_hdbk_f_1.piMFG = 0.0
+    _mil_hdbk_f_1.piN = 0.0
+    _mil_hdbk_f_1.piNR = 0.0
+    _mil_hdbk_f_1.piP = 0.0
+    _mil_hdbk_f_1.piPT = 0.0
+    _mil_hdbk_f_1.piQ = 0.0
+    _mil_hdbk_f_1.piR = 0.0
+    _mil_hdbk_f_1.piS = 0.0
+    _mil_hdbk_f_1.piT = 0.0
+    _mil_hdbk_f_1.piTAPS = 0.0
+    _mil_hdbk_f_1.piU = 0.0
+    _mil_hdbk_f_1.piV = 0.0
+
+    DAO = MockDAO()
+    DAO.table = [
+        _mil_hdbk_f_1,
+    ]
+
+    yield DAO
+
 
 ATTRIBUTES = {
     'A1': 0.0,
@@ -53,17 +107,15 @@ ATTRIBUTES = {
 }
 
 
-@pytest.mark.usefixtures('test_program_dao')
+@pytest.mark.usefixtures('mock_program_dao')
 class TestRAMSTKMilHdbk217F():
     """Class for testing the RAMSTKMilHdbk217F model."""
-    @pytest.mark.integration
-    def test_ramstkmilhdbkf_create(self, test_program_dao):
-        """ __init__() should create an RAMSTKMilHdbkF model. """
-        DUT = test_program_dao.session.query(RAMSTKMilHdbkF).first()
+    @pytest.mark.unit
+    def test_ramstkmilhdbkf_create(self, mock_program_dao):
+        """__init__() should create an RAMSTKMilHdbkF model."""
+        DUT = mock_program_dao.do_select_all(RAMSTKMilHdbkF)[0]
 
         assert isinstance(DUT, RAMSTKMilHdbkF)
-
-        # Verify class attributes are properly initialized.
         assert DUT.__tablename__ == 'ramstk_mil_hdbk_f'
         assert DUT.hardware_id == 1
         assert DUT.A1 == 0.0
@@ -102,10 +154,10 @@ class TestRAMSTKMilHdbk217F():
         assert DUT.piU == 0.0
         assert DUT.piV == 0.0
 
-    @pytest.mark.integration
-    def test_get_attributes(self, test_program_dao):
-        """ get_attributes() should return a tuple of attribute values. """
-        DUT = test_program_dao.session.query(RAMSTKMilHdbkF).first()
+    @pytest.mark.unit
+    def test_get_attributes(self, mock_program_dao):
+        """get_attributes() should return a tuple of attribute values."""
+        DUT = mock_program_dao.do_select_all(RAMSTKMilHdbkF)[0]
 
         _attributes = DUT.get_attributes()
 
@@ -147,27 +199,29 @@ class TestRAMSTKMilHdbk217F():
         assert _attributes['piU'] == 0.0
         assert _attributes['piV'] == 0.0
 
-    @pytest.mark.integration
-    def test_set_attributes(self, test_program_dao):
-        """ set_attributes() should return a zero error code on success. """
-        DUT = test_program_dao.session.query(RAMSTKMilHdbkF).first()
+    @pytest.mark.unit
+    def test_set_attributes(self, mock_program_dao):
+        """set_attributes() should return a zero error code on success."""
+        DUT = mock_program_dao.do_select_all(RAMSTKMilHdbkF)[0]
 
         assert DUT.set_attributes(ATTRIBUTES) is None
 
-    @pytest.mark.integration
-    def test_set_attributes_none_value(self, test_program_dao):
-        """set_attributes() should set an attribute to it's default value when the attribute is passed with a None value."""
-        DUT = test_program_dao.session.query(RAMSTKMilHdbkF).first()
+    @pytest.mark.unit
+    def test_set_attributes_none_value(self, mock_program_dao):
+        """set_attributes() should set an attribute to it's default value when
+        the attribute is passed with a None value."""
+        DUT = mock_program_dao.do_select_all(RAMSTKMilHdbkF)[0]
 
         ATTRIBUTES['piA'] = None
 
         assert DUT.set_attributes(ATTRIBUTES) is None
         assert DUT.get_attributes()['piA'] == 0.0
 
-    @pytest.mark.integration
-    def test_set_attributes_unknown_attributes(self, test_program_dao):
-        """set_attributes() should raise an AttributeError when passed an unknown attribute."""
-        DUT = test_program_dao.session.query(RAMSTKMilHdbkF).first()
+    @pytest.mark.unit
+    def test_set_attributes_unknown_attributes(self, mock_program_dao):
+        """set_attributes() should raise an AttributeError when passed an
+        unknown attribute."""
+        DUT = mock_program_dao.do_select_all(RAMSTKMilHdbkF)[0]
 
         with pytest.raises(AttributeError):
             DUT.set_attributes({'shibboly-bibbly-boo': 0.9998})

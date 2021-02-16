@@ -2,17 +2,90 @@
 # type: ignore
 # -*- coding: utf-8 -*-
 #
-#       tests.dao.programdb.test_ramstkdesignelectric.py is part of The RAMSTK
-#       Project
+#       tests.dao.programdb.ramstkdesignelectric_unit_test.py is part of The
+#       RAMSTK Project
 #
 # All rights reserved.
-"""Test class for testing RAMSTKDesignElectric module algorithms and models. """
+# Copyright 2007 - 2021 Doyle Rowland doyle.rowland <AT> reliaqual <DOT> com
+"""Class for testing RAMSTKDesignElectric module algorithms and models."""
 
 # Third Party Imports
+# noinspection PyPackageRequirements
 import pytest
+# noinspection PyUnresolvedReferences
+from mocks import MockDAO
 
 # RAMSTK Package Imports
 from ramstk.models.programdb import RAMSTKDesignElectric
+
+
+@pytest.fixture
+def mock_program_dao(monkeypatch):
+    _design_electric_1 = RAMSTKDesignElectric()
+    _design_electric_1.revision_id = 1
+    _design_electric_1.hardware_id = 1
+    _design_electric_1.voltage_ac_operating = 0.0
+    _design_electric_1.frequency_operating = 0.0
+    _design_electric_1.type_id = 0
+    _design_electric_1.resistance = 0.0
+    _design_electric_1.package_id = 0
+    _design_electric_1.technology_id = 0
+    _design_electric_1.n_cycles = 0
+    _design_electric_1.n_circuit_planes = 1
+    _design_electric_1.contact_gauge = 0
+    _design_electric_1.current_operating = 0.0
+    _design_electric_1.n_hand_soldered = 0
+    _design_electric_1.contact_rating_id = 0
+    _design_electric_1.area = 0.0
+    _design_electric_1.contact_form_id = 0
+    _design_electric_1.years_in_production = 1
+    _design_electric_1.n_active_pins = 0
+    _design_electric_1.capacitance = 0.0
+    _design_electric_1.temperature_case = 0.0
+    _design_electric_1.current_rated = 0.0
+    _design_electric_1.power_operating = 0.0
+    _design_electric_1.configuration_id = 0
+    _design_electric_1.temperature_hot_spot = 0.0
+    _design_electric_1.temperature_junction = 0.0
+    _design_electric_1.current_ratio = 0.0
+    _design_electric_1.insulation_id = 0
+    _design_electric_1.construction_id = 0
+    _design_electric_1.insert_id = 0
+    _design_electric_1.theta_jc = 0.0
+    _design_electric_1.voltage_dc_operating = 0.0
+    _design_electric_1.power_ratio = 0.0
+    _design_electric_1.family_id = 0
+    _design_electric_1.overstress = 0
+    _design_electric_1.voltage_rated = 0.0
+    _design_electric_1.feature_size = 0.0
+    _design_electric_1.operating_life = 0.0
+    _design_electric_1.application_id = 0
+    _design_electric_1.weight = 0.0
+    _design_electric_1.temperature_rated_max = 0.0
+    _design_electric_1.voltage_ratio = 0.0
+    _design_electric_1.temperature_rated_min = 0.0
+    _design_electric_1.power_rated = 0.0
+    _design_electric_1.environment_active_id = 0
+    _design_electric_1.specification_id = 0
+    _design_electric_1.matching_id = 0
+    _design_electric_1.n_elements = 0
+    _design_electric_1.environment_dormant_id = 0
+    _design_electric_1.reason = ''
+    _design_electric_1.voltage_esd = 0.0
+    _design_electric_1.manufacturing_id = 0
+    _design_electric_1.n_wave_soldered = 0
+    _design_electric_1.temperature_knee = 25.0
+    _design_electric_1.temperature_rise = 0.0
+    _design_electric_1.temperature_active = 35.0
+    _design_electric_1.temperature_dormant = 25.0
+
+    DAO = MockDAO()
+    DAO.table = [
+        _design_electric_1,
+    ]
+
+    yield DAO
+
 
 ATTRIBUTES = {
     'voltage_ac_operating': 0.0,
@@ -72,17 +145,15 @@ ATTRIBUTES = {
 }
 
 
-@pytest.mark.usefixtures('test_program_dao')
-class TestRAMSTKDesignElectric():
+@pytest.mark.usefixtures('mock_program_dao')
+class TestRAMSTKDesignElectric:
     """Class for testing the RAMSTKDesignElectric model."""
-    @pytest.mark.integration
-    def test_ramstkdesignelectric_create(self, test_program_dao):
-        """ __init__() should create an RAMSTKDesignElectric model. """
-        DUT = test_program_dao.session.query(RAMSTKDesignElectric).first()
+    @pytest.mark.unit
+    def test_ramstkdesignelectric_create(self, mock_program_dao):
+        """__init__() should create an RAMSTKDesignElectric model."""
+        DUT = mock_program_dao.do_select_all(RAMSTKDesignElectric)[0]
 
         assert isinstance(DUT, RAMSTKDesignElectric)
-
-        # Verify class attributes are properly initialized.
         assert DUT.__tablename__ == 'ramstk_design_electric'
         assert DUT.hardware_id == 1
         assert DUT.application_id == 0
@@ -139,10 +210,10 @@ class TestRAMSTKDesignElectric():
         assert DUT.weight == 0.0
         assert DUT.years_in_production == 1
 
-    @pytest.mark.integration
-    def test_get_attributes(self, test_program_dao):
-        """ get_attributes() should return a tuple of attribute values. """
-        DUT = test_program_dao.session.query(RAMSTKDesignElectric).first()
+    @pytest.mark.unit
+    def test_get_attributes(self, mock_program_dao):
+        """get_attributes() should return a tuple of attribute values."""
+        DUT = mock_program_dao.do_select_all(RAMSTKDesignElectric)[0]
 
         _attributes = DUT.get_attributes()
 
@@ -203,27 +274,29 @@ class TestRAMSTKDesignElectric():
         assert _attributes['temperature_active'] == 35.0
         assert _attributes['temperature_dormant'] == 25.0
 
-    @pytest.mark.integration
-    def test_set_attributes(self, test_program_dao):
-        """ set_attributes() should return a zero error code on success. """
-        DUT = test_program_dao.session.query(RAMSTKDesignElectric).first()
+    @pytest.mark.unit
+    def test_set_attributes(self, mock_program_dao):
+        """set_attributes() should return a zero error code on success."""
+        DUT = mock_program_dao.do_select_all(RAMSTKDesignElectric)[0]
 
         assert DUT.set_attributes(ATTRIBUTES) is None
 
-    @pytest.mark.integration
-    def test_set_attributes_none_value(self, test_program_dao):
-        """set_attributes() should set an attribute to it's default value when the attribute is passed with a None value."""
-        DUT = test_program_dao.session.query(RAMSTKDesignElectric).first()
+    @pytest.mark.unit
+    def test_set_attributes_none_value(self, mock_program_dao):
+        """set_attributes() should set an attribute to it's default value when
+        the attribute is passed with a None value."""
+        DUT = mock_program_dao.do_select_all(RAMSTKDesignElectric)[0]
 
         ATTRIBUTES['type_id'] = None
 
         assert DUT.set_attributes(ATTRIBUTES) is None
         assert DUT.get_attributes()['type_id'] == 0
 
-    @pytest.mark.integration
-    def test_set_attributes_unknown_attributes(self, test_program_dao):
-        """set_attributes() should raise an AttributeError when passed an unknown attribute."""
-        DUT = test_program_dao.session.query(RAMSTKDesignElectric).first()
+    @pytest.mark.unit
+    def test_set_attributes_unknown_attributes(self, mock_program_dao):
+        """set_attributes() should raise an AttributeError when passed an
+        unknown attribute."""
+        DUT = mock_program_dao.do_select_all(RAMSTKDesignElectric)[0]
 
         with pytest.raises(AttributeError):
             DUT.set_attributes({'shibboly-bibbly-boo': 0.9998})

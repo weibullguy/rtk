@@ -6,8 +6,8 @@
 #       Project
 #
 # All rights reserved.
-"""Test class for testing the RAMSTKEnvironment module algorithms and
-models."""
+# Copyright 2007 - 2021 Doyle Rowland doyle.rowland <AT> reliaqual <DOT> com
+"""Class for testing the RAMSTKEnvironment module algorithms and models."""
 
 # Third Party Imports
 # noinspection PyPackageRequirements
@@ -92,8 +92,6 @@ class TestRAMSTKEnvironment:
         DUT = mock_program_dao.do_select_all(RAMSTKEnvironment)[0]
 
         assert isinstance(DUT, RAMSTKEnvironment)
-
-        # Verify class attributes are properly initialized.
         assert DUT.__tablename__ == 'ramstk_environment'
         assert DUT.phase_id == 1
         assert DUT.environment_id == 1
@@ -132,7 +130,7 @@ class TestRAMSTKEnvironment:
         assert DUT.set_attributes(ATTRIBUTES) is None
 
     @pytest.mark.unit
-    def test_set_attributes_none_value(self, mock_program_dao):
+    def test_set_attributes_set_default(self, mock_program_dao):
         """set_attributes() should set an attribute to it's default value when
         the attribute is passed with a None value."""
         DUT = mock_program_dao.do_select_all(RAMSTKEnvironment)[0]

@@ -2,17 +2,88 @@
 # type: ignore
 # -*- coding: utf-8 -*-
 #
-#       tests.dao.programdb.test_ramstkdesignmechanic.py is part of The RAMSTK
-#       Project
+#       tests.dao.programdb.ramstkdesignmechanic_unit_test.py is part of The
+#       RAMSTK Project
 #
 # All rights reserved.
-"""Test class for testing the RAMSTKDesignMechanic module algorithms and models. """
+# Copyright 2007 - 2021 Doyle Rowland doyle.rowland <AT> reliaqual <DOT> com
+"""Class for testing the RAMSTKDesignMechanic module algorithms and models."""
 
 # Third Party Imports
+# noinspection PyPackageRequirements
 import pytest
+# noinspection PyUnresolvedReferences
+from mocks import MockDAO
 
 # RAMSTK Package Imports
 from ramstk.models.programdb import RAMSTKDesignMechanic
+
+
+@pytest.fixture
+def mock_program_dao(monkeypatch):
+    _design_mechanic_1 = RAMSTKDesignMechanic()
+    _design_mechanic_1.revision_id = 1
+    _design_mechanic_1.hardware_id = 1
+    _design_mechanic_1.pressure_upstream = 0.0
+    _design_mechanic_1.frequency_operating = 0.0
+    _design_mechanic_1.surface_finish = 0.0
+    _design_mechanic_1.friction = 0.0
+    _design_mechanic_1.length_compressed = 0.0
+    _design_mechanic_1.load_id = 0
+    _design_mechanic_1.n_cycles = 0
+    _design_mechanic_1.balance_id = 0
+    _design_mechanic_1.lubrication_id = 0
+    _design_mechanic_1.water_per_cent = 0.0
+    _design_mechanic_1.misalignment_angle = 0.0
+    _design_mechanic_1.type_id = 0
+    _design_mechanic_1.rpm_design = 0.0
+    _design_mechanic_1.pressure_downstream = 0.0
+    _design_mechanic_1.diameter_coil = 0.0
+    _design_mechanic_1.manufacturing_id = 0
+    _design_mechanic_1.pressure_contact = 0.0
+    _design_mechanic_1.meyer_hardness = 0.0
+    _design_mechanic_1.rpm_operating = 0.0
+    _design_mechanic_1.length_relaxed = 0.0
+    _design_mechanic_1.impact_id = 0
+    _design_mechanic_1.n_ten = 0
+    _design_mechanic_1.material_id = 0
+    _design_mechanic_1.technology_id = 0
+    _design_mechanic_1.service_id = 0
+    _design_mechanic_1.flow_design = 0.0
+    _design_mechanic_1.application_id = 0
+    _design_mechanic_1.diameter_wire = 0.0
+    _design_mechanic_1.deflection = 0.0
+    _design_mechanic_1.filter_size = 0.0
+    _design_mechanic_1.diameter_inner = 0.0
+    _design_mechanic_1.pressure_rated = 0.0
+    _design_mechanic_1.altitude_operating = 0.0
+    _design_mechanic_1.thickness = 0.0
+    _design_mechanic_1.diameter_outer = 0.0
+    _design_mechanic_1.n_elements = 0
+    _design_mechanic_1.contact_pressure = 0.0
+    _design_mechanic_1.particle_size = 0.0
+    _design_mechanic_1.casing_id = 0
+    _design_mechanic_1.viscosity_dynamic = 0.0
+    _design_mechanic_1.viscosity_design = 0.0
+    _design_mechanic_1.torque_id = 0
+    _design_mechanic_1.leakage_allowable = 0.0
+    _design_mechanic_1.offset = 0.0
+    _design_mechanic_1.width_minimum = 0.0
+    _design_mechanic_1.load_operating = 0.0
+    _design_mechanic_1.spring_index = 0.0
+    _design_mechanic_1.flow_operating = 0.0
+    _design_mechanic_1.pressure_delta = 0.0
+    _design_mechanic_1.length = 0.0
+    _design_mechanic_1.load_design = 0.0
+    _design_mechanic_1.clearance = 0.0
+
+    DAO = MockDAO()
+    DAO.table = [
+        _design_mechanic_1,
+    ]
+
+    yield DAO
+
 
 ATTRIBUTES = {
     'pressure_upstream': 0.0,
@@ -70,17 +141,15 @@ ATTRIBUTES = {
 }
 
 
-@pytest.mark.usefixtures('test_program_dao')
-class TestRAMSTKDesignMechanic():
+@pytest.mark.usefixtures('mock_program_dao')
+class TestRAMSTKDesignMechanic:
     """Class for testing the RAMSTKDesignMechanic model."""
-    @pytest.mark.integration
-    def test_ramstkdesignmechanic_create(self, test_program_dao):
-        """ __init__() should create an RAMSTKDesignMechanic model. """
-        DUT = test_program_dao.session.query(RAMSTKDesignMechanic).first()
+    @pytest.mark.unit
+    def test_ramstkdesignmechanic_create(self, mock_program_dao):
+        """__init__() should create an RAMSTKDesignMechanic model."""
+        DUT = mock_program_dao.do_select_all(RAMSTKDesignMechanic)[0]
 
         assert isinstance(DUT, RAMSTKDesignMechanic)
-
-        # Verify class attributes are properly initialized.
         assert DUT.__tablename__ == 'ramstk_design_mechanic'
         assert DUT.hardware_id == 1
         assert DUT.altitude_operating == 0.0
@@ -136,10 +205,10 @@ class TestRAMSTKDesignMechanic():
         assert DUT.water_per_cent == 0.0
         assert DUT.width_minimum == 0.0
 
-    @pytest.mark.integration
-    def test_get_attributes(self, test_program_dao):
-        """ get_attributes() should return a tuple of attribute values. """
-        DUT = test_program_dao.session.query(RAMSTKDesignMechanic).first()
+    @pytest.mark.unit
+    def test_get_attributes(self, mock_program_dao):
+        """get_attributes() should return a tuple of attribute values."""
+        DUT = mock_program_dao.do_select_all(RAMSTKDesignMechanic)[0]
 
         _attributes = DUT.get_attributes()
         assert isinstance(_attributes, dict)
@@ -197,27 +266,29 @@ class TestRAMSTKDesignMechanic():
         assert _attributes['load_design'] == 0.0
         assert _attributes['clearance'] == 0.0
 
-    @pytest.mark.integration
-    def test_set_attributes(self, test_program_dao):
-        """ set_attributes() should return a zero error code on success. """
-        DUT = test_program_dao.session.query(RAMSTKDesignMechanic).first()
+    @pytest.mark.unit
+    def test_set_attributes(self, mock_program_dao):
+        """set_attributes() should return a zero error code on success."""
+        DUT = mock_program_dao.do_select_all(RAMSTKDesignMechanic)[0]
 
         assert DUT.set_attributes(ATTRIBUTES) is None
 
-    @pytest.mark.integration
-    def test_set_attributes_none_value(self, test_program_dao):
-        """set_attributes() should set an attribute to it's default value when the attribute is passed with a None value."""
-        DUT = test_program_dao.session.query(RAMSTKDesignMechanic).first()
+    @pytest.mark.unit
+    def test_set_attributes_none_value(self, mock_program_dao):
+        """set_attributes() should set an attribute to it's default value when
+        the attribute is passed with a None value."""
+        DUT = mock_program_dao.do_select_all(RAMSTKDesignMechanic)[0]
 
         ATTRIBUTES['type_id'] = None
 
         assert DUT.set_attributes(ATTRIBUTES) is None
         assert DUT.get_attributes()['type_id'] == 0.0
 
-    @pytest.mark.integration
-    def test_set_attributes_unknown_attributes(self, test_program_dao):
-        """set_attributes() should raise an AttributeError when passed an unknown attribute."""
-        DUT = test_program_dao.session.query(RAMSTKDesignMechanic).first()
+    @pytest.mark.unit
+    def test_set_attributes_unknown_attributes(self, mock_program_dao):
+        """set_attributes() should raise an AttributeError when passed an
+        unknown attribute."""
+        DUT = mock_program_dao.do_select_all(RAMSTKDesignMechanic)[0]
 
         with pytest.raises(AttributeError):
             DUT.set_attributes({'shibboly-bibbly-boo': 0.9998})
