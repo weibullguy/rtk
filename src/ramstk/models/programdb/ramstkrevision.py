@@ -20,6 +20,7 @@ class RAMSTKRevision(RAMSTK_BASE, RAMSTKBaseTable):
     """Class to represent ramstk_revision table in the RAMSTK Program database.
 
     This table shares a:
+        * One-to-Many relationship with ramstk_environment.
         * One-to-Many relationship with ramstk_mission.
         * One-to-Many relationship with ramstk_failure_definition.
         * One-to-Many relationship with ramstk_function.
@@ -178,8 +179,18 @@ class RAMSTKRevision(RAMSTK_BASE, RAMSTKBaseTable):
                              default=__defaults__['program_cost_sd'])
 
     # Define the relationships to other tables in the RAMSTK Program database.
+    environment: relationship = relationship(
+        'RAMSTKEnvironment',
+        back_populates='revision',
+        cascade='delete',
+    )
     mission: relationship = relationship(
         'RAMSTKMission',
+        back_populates='revision',
+        cascade='delete',
+    )
+    phase: relationship = relationship(
+        'RAMSTKMissionPhase',
         back_populates='revision',
         cascade='delete',
     )

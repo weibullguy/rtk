@@ -36,7 +36,7 @@ class DataManager(RAMSTKDataManager):
 
         # Initialize private dictionary attributes.
         self._dic_status: Dict[Any, List[float]] = {}
-        self._pkey = {'status': ['revision_id', 'status_id']}
+        self._pkey = {'program_status': ['revision_id', 'status_id']}
 
         # Initialize private list attributes.
 
@@ -53,11 +53,9 @@ class DataManager(RAMSTKDataManager):
                       'request_get_program_status_attributes')
         pub.subscribe(super().do_set_attributes,
                       'request_set_program_status_attributes')
-        pub.subscribe(super().do_update_all,
-                      'request_update_all_program_status')
+        pub.subscribe(super().do_update, 'request_update_program_status')
 
         pub.subscribe(self.do_select_all, 'selected_revision')
-        pub.subscribe(self.do_update, 'request_update_program_status')
         pub.subscribe(self.do_get_tree, 'request_get_program_status_tree')
 
         pub.subscribe(self._do_delete, 'request_delete_program_status')
@@ -97,10 +95,10 @@ class DataManager(RAMSTKDataManager):
 
             self._dic_status[_status.date_status] = _status.status_id
 
-            self.tree.create_node(tag='status',
+            self.tree.create_node(tag='program_status',
                                   identifier=_status.status_id,
                                   parent=self._root,
-                                  data={'status': _status})
+                                  data={'program_status': _status})
 
         self.last_id = max(self.tree.nodes.keys())
 
@@ -108,66 +106,6 @@ class DataManager(RAMSTKDataManager):
             'succeed_retrieve_program_status',
             tree=self.tree,
         )
-
-    def do_update(self, node_id):
-        """Update record associated with node ID in RAMSTK Program database.
-
-        :param node_id: the status ID of the program status item to save.
-        :return: None
-        :rtype: None
-        """
-        try:
-            self.dao.do_update(self.tree.get_node(node_id).data['status'])
-
-            pub.sendMessage(
-                'succeed_update_program_status',
-                tree=self.tree,
-            )
-        except AttributeError:
-            _method_name: str = inspect.currentframe(  # type: ignore
-            ).f_code.co_name
-            _error_msg: str = (
-                '{1}: Attempted to save non-existent program status with '
-                'status ID {0}.').format(str(node_id), _method_name)
-            pub.sendMessage(
-                'do_log_debug',
-                logger_name='DEBUG',
-                message=_error_msg,
-            )
-            pub.sendMessage(
-                'fail_update_program_status',
-                error_message=_error_msg,
-            )
-        except KeyError:
-            _method_name: str = inspect.currentframe(  # type: ignore
-            ).f_code.co_name
-            _error_msg = ('{1}: No data package found for program status ID '
-                          '{0}.').format(str(node_id), _method_name)
-            pub.sendMessage(
-                'do_log_debug',
-                logger_name='DEBUG',
-                message=_error_msg,
-            )
-            pub.sendMessage(
-                'fail_update_program_status',
-                error_message=_error_msg,
-            )
-        except TypeError:
-            if node_id != 0:
-                _method_name: str = inspect.currentframe(  # type: ignore
-                ).f_code.co_name
-                _error_msg = ('{1}: The value for one or more attributes for '
-                              'program status ID {0} was the wrong '
-                              'type.').format(str(node_id), _method_name)
-                pub.sendMessage(
-                    'do_log_debug',
-                    logger_name='DEBUG',
-                    message=_error_msg,
-                )
-                pub.sendMessage(
-                    'fail_update_program_status',
-                    error_message=_error_msg,
-                )
 
     def _do_delete(self, node_id: int) -> None:
         """Remove a Program Status task.
@@ -182,7 +120,7 @@ class DataManager(RAMSTKDataManager):
             logger and a user dialog.
         """
         try:
-            super().do_delete(node_id, 'status')
+            super().do_delete(node_id, 'program_status')
 
             self.tree.remove_node(node_id)
             self.last_id = max(self.tree.nodes.keys())
@@ -223,10 +161,10 @@ class DataManager(RAMSTKDataManager):
 
             self._dic_status[_status.date_status] = _status.status_id
 
-            self.tree.create_node(tag='status',
+            self.tree.create_node(tag='program_status',
                                   identifier=_status.status_id,
                                   parent=self._root,
-                                  data={'status': _status})
+                                  data={'program_status': _status})
 
             pub.sendMessage(
                 'succeed_insert_program_status',
@@ -260,8 +198,8 @@ class DataManager(RAMSTKDataManager):
             _node_id = self.last_id
 
         self.tree.get_node(
-            _node_id).data['status'].cost_remaining = cost_remaining
+            _node_id).data['program_status'].cost_remaining = cost_remaining
         self.tree.get_node(
-            _node_id).data['status'].time_remaining = time_remaining
+            _node_id).data['program_status'].time_remaining = time_remaining
 
-        self.do_update(_node_id)
+        self.do_update(_node_id, table='program_status')

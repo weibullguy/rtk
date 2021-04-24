@@ -7,7 +7,6 @@
 """Options Package Data Model."""
 
 # Standard Library Imports
-import inspect
 from typing import Any, Dict, List
 
 # Third Party Imports
@@ -15,7 +14,6 @@ from pubsub import pub
 
 # RAMSTK Package Imports
 from ramstk.controllers import RAMSTKDataManager
-from ramstk.exceptions import DataAccessError
 from ramstk.models.commondb import RAMSTKSiteInfo
 
 
@@ -105,62 +103,3 @@ class DataManager(RAMSTKDataManager):
             'succeed_retrieve_options',
             tree=self.tree,
         )
-
-    def do_update(self, node_id: str) -> None:
-        """Update the record associated with node ID in RAMSTK databases.
-
-        :param node_id: the node ID of the Options item to save.
-        :return: None
-        :rtype: None
-        """
-        try:
-            self.dao.do_update(self.tree.get_node(node_id).data['siteinfo'])
-
-            pub.sendMessage(
-                'succeed_update_options',
-                node_id=node_id,
-            )
-        except AttributeError:
-            _method_name: str = inspect.currentframe(  # type: ignore
-            ).f_code.co_name
-            _error_msg = (
-                '{1}: Attempted to save non-existent Site ID {0}.').format(
-                    str(node_id), _method_name)
-            pub.sendMessage(
-                'do_log_debug',
-                logger_name='DEBUG',
-                message=_error_msg,
-            )
-            pub.sendMessage(
-                'fail_update_options',
-                error_message=_error_msg,
-            )
-        except KeyError:
-            _method_name: str = inspect.currentframe(  # type: ignore
-            ).f_code.co_name
-            _error_msg = ('{1}: No data package found for Site {0} '
-                          'options.').format(str(node_id), _method_name)
-            pub.sendMessage(
-                'do_log_debug',
-                logger_name='DEBUG',
-                message=_error_msg,
-            )
-            pub.sendMessage(
-                'fail_update_options',
-                error_message=_error_msg,
-            )
-        except (TypeError, DataAccessError):
-            _method_name: str = inspect.currentframe(  # type: ignore
-            ).f_code.co_name
-            _error_msg = ('{1}: The value for one or more attributes for '
-                          'Site {0} options was the wrong type.').format(
-                              str(node_id), _method_name)
-            pub.sendMessage(
-                'do_log_debug',
-                logger_name='DEBUG',
-                message=_error_msg,
-            )
-            pub.sendMessage(
-                'fail_update_options',
-                error_message=_error_msg,
-            )

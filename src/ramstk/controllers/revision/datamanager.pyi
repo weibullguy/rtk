@@ -21,9 +21,6 @@ class DataManager(RAMSTKDataManager):
     def do_select_all(self) -> None:
         ...
 
-    def do_update(self, node_id: int) -> None:
-        ...
-
     def _do_delete(self, node_id: int) -> None:
         ...
 

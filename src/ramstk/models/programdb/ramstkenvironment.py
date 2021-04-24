@@ -38,6 +38,12 @@ class RAMSTKEnvironment(RAMSTK_BASE, RAMSTKBaseTable):
     __tablename__ = 'ramstk_environment'
     __table_args__ = {'extend_existing': True}
 
+    revision_id = Column(
+        'fld_revision_id',
+        Integer,
+        ForeignKey('ramstk_revision.fld_revision_id'),
+        nullable=False,
+    )
     phase_id = Column(
         'fld_phase_id',
         Integer,
@@ -69,8 +75,10 @@ class RAMSTKEnvironment(RAMSTK_BASE, RAMSTKBaseTable):
                              default=__defaults__['high_dwell_time'])
 
     # Define the relationships to other tables in the RAMSTK Program database.
-    phase = relationship(  # type: ignore
-        'RAMSTKMissionPhase', back_populates='environment')
+    revision: relationship = relationship('RAMSTKRevision',
+                                          back_populates='environment')
+    phase: relationship = relationship('RAMSTKMissionPhase',
+                                       back_populates='environment')
 
     is_mission = False
     is_phase = False

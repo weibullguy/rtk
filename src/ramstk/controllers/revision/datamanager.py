@@ -29,7 +29,7 @@ class DataManager(RAMSTKDataManager):
     RAMSKTEnvironment data models.
     """
 
-    _tag = 'revision'
+    _tag = 'revisions'
 
     def __init__(self, **kwargs: Dict[Any, Any]) -> None:
         """Initialize a Revision data manager instance."""
@@ -54,11 +54,10 @@ class DataManager(RAMSTKDataManager):
         pub.subscribe(super().do_set_attributes,
                       'request_set_revision_attributes')
         pub.subscribe(super().do_set_attributes, 'wvw_editing_revision')
-        pub.subscribe(super().do_update_all, 'request_update_all_revisions')
+        pub.subscribe(super().do_update, 'request_update_revision')
 
         pub.subscribe(self.do_get_tree, 'request_get_revision_tree')
         pub.subscribe(self.do_select_all, 'request_retrieve_revisions')
-        pub.subscribe(self.do_update, 'request_update_revision')
 
         pub.subscribe(self._do_delete, 'request_delete_revision')
         pub.subscribe(self._do_insert_revision, 'request_insert_revision')
@@ -98,62 +97,6 @@ class DataManager(RAMSTKDataManager):
             tree=self.tree,
         )
 
-    def do_update(self, node_id: int) -> None:
-        """Update record associated with node ID in RAMSTK Program database.
-
-        :param node_id: the node (revision) ID of the revision to save.
-        :return: None
-        :rtype: None
-        """
-        _method_name: str = inspect.currentframe(  # type: ignore
-        ).f_code.co_name
-
-        try:
-            self.dao.do_update(self.tree.get_node(node_id).data['revision'])
-            pub.sendMessage(
-                'succeed_update_revision',
-                tree=self.tree,
-            )
-        except AttributeError:
-            _error_msg: str = (
-                '{1}: Attempted to save non-existent revision with revision '
-                'ID {0}.').format(str(node_id), _method_name)
-            pub.sendMessage(
-                'do_log_debug',
-                logger_name='DEBUG',
-                message=_error_msg,
-            )
-            pub.sendMessage(
-                'fail_update_revision',
-                error_message=_error_msg,
-            )
-        except KeyError:
-            _error_msg = ('{1}: No data package found for revision '
-                          'ID {0}.').format(str(node_id), _method_name)
-            pub.sendMessage(
-                'do_log_debug',
-                logger_name='DEBUG',
-                message=_error_msg,
-            )
-            pub.sendMessage(
-                'fail_update_revision',
-                error_message=_error_msg,
-            )
-        except (DataAccessError, TypeError):
-            if node_id != 0:
-                _error_msg = ('{1}: The value for one or more attributes for '
-                              'revision ID {0} was the wrong type.').format(
-                                  str(node_id), _method_name)
-                pub.sendMessage(
-                    'do_log_debug',
-                    logger_name='DEBUG',
-                    message=_error_msg,
-                )
-                pub.sendMessage(
-                    'fail_update_revision',
-                    error_message=_error_msg,
-                )
-
     def _do_delete(self, node_id: int) -> None:
         """Remove a revision.
 
@@ -176,8 +119,8 @@ class DataManager(RAMSTKDataManager):
             _method_name: str = inspect.currentframe(  # type: ignore
             ).f_code.co_name
             _error_msg: str = (
-                '{1}: Attempted to delete non-existent revision ID {'
-                '0}.').format(str(node_id), _method_name)
+                '{1}: Attempted to delete non-existent revision ID '
+                '{0}.').format(str(node_id), _method_name)
             pub.sendMessage(
                 'do_log_debug',
                 logger_name='DEBUG',

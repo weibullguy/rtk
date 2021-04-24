@@ -9,6 +9,7 @@ from ramstk.configuration import (
     RAMSTKUserConfiguration as RAMSTKUserConfiguration
 )
 from ramstk.db.base import BaseDatabase as BaseDatabase
+from ramstk.exceptions import DataAccessError as DataAccessError
 
 class RAMSTKAnalysisManager:
     RAMSTK_USER_CONFIGURATION: Any = ...
@@ -59,6 +60,9 @@ class RAMSTKDataManager:
         ...
 
     def do_set_tree(self, tree: treelib.Tree) -> None:
+        ...
+
+    def do_update(self, node_id: int, table: str) -> None:
         ...
 
     def do_update_all(self) -> None:

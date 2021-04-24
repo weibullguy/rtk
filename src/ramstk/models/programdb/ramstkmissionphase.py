@@ -34,6 +34,12 @@ class RAMSTKMissionPhase(RAMSTK_BASE, RAMSTKBaseTable):
     __tablename__ = 'ramstk_mission_phase'
     __table_args__ = {'extend_existing': True}
 
+    revision_id = Column(
+        'fld_revision_id',
+        Integer,
+        ForeignKey('ramstk_revision.fld_revision_id'),
+        nullable=False,
+    )
     mission_id = Column(
         'fld_mission_id',
         Integer,
@@ -60,11 +66,15 @@ class RAMSTKMissionPhase(RAMSTK_BASE, RAMSTKBaseTable):
                        default=__defaults__['phase_end'])
 
     # Define the relationships to other tables in the RAMSTK Program database.
-    mission = relationship(  # type: ignore
+    revision: relationship = relationship(
+        'RAMSTKRevision',
+        back_populates='phase',
+    )
+    mission: relationship = relationship(
         'RAMSTKMission',
         back_populates='phase',
     )
-    environment = relationship(  # type: ignore
+    environment: relationship = relationship(
         'RAMSTKEnvironment',
         back_populates='phase',
         cascade='delete',

@@ -103,6 +103,7 @@ help:
 clean: clean-build clean-docs clean-pyc clean-test		## removes all build, test, coverage, and Python artifacts
 
 clean-build:	## remove build artifacts
+	@echo -e "\n\t\033[1;37;43mCleaning up old build artifacts ...\033[0m\n"
 	rm -fr build/
 	rm -fr dist/
 	rm -fr .eggs/
@@ -119,9 +120,8 @@ clean-pyc:		## remove Python file artifacts
 	$(shell find . -name '__pycache__' -exec rm -fr {} +)
 
 clean-test:	clean-pyc	## remove test and coverage artifacts
-	@echo -e "\n\t\033[1;33mCleaning up old test run artifacts ...\033[0m\n"
+	@echo -e "\n\t\033[1;37;43mCleaning up old test run artifacts ...\033[0m\n"
 	rm -fr .tox/
-	rm -f .coverage
 	rm -fr .reports/coverage
 	rm -fr .pytest_cache
 
@@ -140,7 +140,7 @@ upgrade:
 
 # Targets to install and uninstall RAMSTK.
 install: clean-build clean-pyc
-	@echo -e "\n\t\033[1;32mInstalling RAMSTK to $(PREFIX) ...\033[0m\n"
+	@echo -e "\n\t\033[1;37;42mInstalling RAMSTK to $(PREFIX) ...\033[0m\n"
 	pip install . --prefix=$(PREFIX)
 	${MKDIR} "$(PREFIX)/share/RAMSTK"
 	${MKDIR} "$(PREFIX)/share/RAMSTK/layouts"
@@ -170,7 +170,7 @@ install: clean-build clean-pyc
 	${COPY} "./data/RAMSTK.toml" "$(PREFIX)/share/RAMSTK/"
 
 uninstall:
-	@echo -e "\n\t\033[1;31mUninstalling RAMSTK :( ...\033[0m\n"
+	@echo -e "\n\t\033[1;31;47mUninstalling RAMSTK :( ...\033[0m\n"
 	pip uninstall -y ramstk
 	${RMDIR} "$(PREFIX)/share/RAMSTK/"
 	${RM} "$(PREFIX)/share/pixmaps/RAMSTK.png"
@@ -178,32 +178,34 @@ uninstall:
 
 # Targets for testing.
 test.unit: clean-test
+	@echo -e "\n\t\033[1;37;1:43mRunning RAMSTK unit tests without coverage ...\033[0m\n"
 	py.test $(TESTOPTS) -m unit $(TESTFILE)
 
 test.calc: clean-test
 	py.test $(TESTOPTS) -m calculation $(TESTFILE)
 
 test.integration: clean-test
+	@echo -e "\n\t\033[1;37;1;43mRunning RAMSTK integration tests without coverage ...\033[0m\n"
 	py.test $(TESTOPTS) -m integration $(TESTFILE)
 
 test.gui: clean-test
 	py.test $(TESTOPTS) -m gui $(TESTFILE)
 
-test:
-	@echo -e "\n\t\033[1;33mRunning RAMSTK test suite without coverage ...\033[0m\n"
-	py.test $(TESTOPTS) -v -s $(TESTFILE)
+test: clean-test
+	@echo -e "\n\t\033[1;37;1;45mRunning RAMSTK test suite without coverage ...\033[0m\n"
+	py.test $(TESTOPTS) $(TESTFILE)
 
 test-all:
 	$(info "TODO: Need to add tox support for this target to work.")
 
 coverage: clean-test
-	@echo -e "\n\t\033[1;32mRunning RAMSTK test suite with coverage ...\033[0m\n"
+	@echo -e "\n\t\033[1;37;42mRunning RAMSTK test suite with coverage ...\033[0m\n"
 	py.test $(TESTOPTS) $(TESTFILE)
 
 # This target is for use with IDE integration.
 format:
 	@echo -e "\n\t\033[1;32mAutoformatting $(SRCFILE) ...\033[0m\n"
-	$(BLACK) $(SRCFILE)
+	$(BLACK) $(BLACK_ARGS) $(SRCFILE)
 	$(ISORT) $(ISORT_ARGS) $(SRCFILE)
 	$(DOCFORMATTER) $(DOCFORMATTER_ARGS) $(SRCFILE)
 
@@ -257,9 +259,9 @@ packchk:
 	$(PYROMA) .
 
 build: clean
-	$(info Creating source distribution and wheel ...)
+	@echo -e "\n\t\033[33;47mCreating source distribution and wheel ...\033[0m\n"
 	$(POETRY) build
 
 release: packchk build
-	$(info Build and upload artifacts to PyPi ...)
+	@echo -e "\n\t\033[33;47mBuilding and uploading artifacts to PyPi ...\033[0m\n"
 	$(POETRY) publish

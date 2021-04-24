@@ -152,7 +152,7 @@ class TestRAMSTKRevision():
         assert DUT.program_cost == 26492.83
         assert DUT.program_cost_sd == 15.62
 
-    @pytest.mark.integration
+    @pytest.mark.unit
     def test_get_attributes(self, mock_program_dao):
         """get_attributes() should return a dict of {attr name:attr value}
         pairs."""

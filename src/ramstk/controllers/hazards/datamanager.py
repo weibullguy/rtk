@@ -53,13 +53,12 @@ class DataManager(RAMSTKDataManager):
         pub.subscribe(super().do_set_attributes,
                       'request_set_hazard_attributes')
         pub.subscribe(super().do_set_attributes, 'wvw_editing_hazard')
-        pub.subscribe(super().do_update_all, 'request_update_all_hazards')
+        pub.subscribe(super().do_update, 'request_update_hazard')
 
         pub.subscribe(self.do_get_tree, 'request_get_hazard_tree')
         pub.subscribe(self.do_select_all, 'selected_function')
         pub.subscribe(self.do_set_all_attributes,
                       'request_set_all_hazard_attributes')
-        pub.subscribe(self.do_update, 'request_update_hazard')
 
         pub.subscribe(self._do_delete, 'request_delete_hazard')
         pub.subscribe(self._do_insert_hazard, 'request_insert_hazard')
@@ -117,49 +116,6 @@ class DataManager(RAMSTKDataManager):
             super().do_set_attributes(node_id=[attributes['hazard_id'], ''],
                                       package={_key: attributes[_key]})
 
-    def do_update(self, node_id: int) -> None:
-        """Update record associated with node ID in RAMSTK Program database.
-
-        :param node_id: the node (hazard) ID of the hazard to save.
-        :return: None
-        :rtype: None
-        """
-        try:
-            self.dao.do_update(self.tree.get_node(node_id).data['hazard'])
-            pub.sendMessage(
-                'succeed_update_hazard',
-                tree=self.tree,
-            )
-        except AttributeError:
-            _method_name: str = inspect.currentframe(  # type: ignore
-            ).f_code.co_name
-            _error_msg = ('{1}: Attempted to delete non-existent hazard '
-                          'ID {0}.').format(str(node_id), _method_name)
-            pub.sendMessage(
-                'do_log_debug',
-                logger_name='DEBUG',
-                message=_error_msg,
-            )
-            pub.sendMessage(
-                'fail_update_hazard',
-                error_message=_error_msg,
-            )
-        except TypeError:
-            if node_id != 0:
-                _method_name: str = inspect.currentframe(  # type: ignore
-                ).f_code.co_name
-                _error_msg = ('{1}: No data package found for hazard ID {'
-                              '0}.').format(str(node_id), _method_name)
-                pub.sendMessage(
-                    'do_log_debug',
-                    logger_name='DEBUG',
-                    message=_error_msg,
-                )
-                pub.sendMessage(
-                    'fail_update_hazard',
-                    error_message=_error_msg,
-                )
-
     def _do_delete(self, node_id: int) -> None:
         """Remove a hazard.
 
@@ -197,7 +153,7 @@ class DataManager(RAMSTKDataManager):
         """Add a new hazard to parent (function) ID.
 
         :param parent_id: the parent (function) ID to associate the new hazard
-        with.
+            with.
         :return: None
         :rtype: None
         """

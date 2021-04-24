@@ -54,12 +54,10 @@ class DataManager(RAMSTKDataManager):
                       'request_set_similar_item_attributes')
         pub.subscribe(super().do_set_attributes, 'wvw_editing_similar_item')
         pub.subscribe(super().do_set_tree, 'succeed_calculate_similar_item')
-        pub.subscribe(super().do_update_all,
-                      'request_update_all_similar_items')
+        pub.subscribe(super().do_update, 'request_update_similar_item')
 
         pub.subscribe(self.do_get_tree, 'request_get_similar_item_tree')
         pub.subscribe(self.do_select_all, 'selected_revision')
-        pub.subscribe(self.do_update, 'request_update_similar_item')
 
         pub.subscribe(self._do_delete, 'request_delete_hardware')
         pub.subscribe(self._do_insert_similar_item,
@@ -105,66 +103,6 @@ class DataManager(RAMSTKDataManager):
             'succeed_retrieve_similar_item',
             tree=self.tree,
         )
-
-    def do_update(self, node_id: int) -> None:
-        """Update record associated with node ID in RAMSTK Program database.
-
-        :param node_id: the hardware ID of the hardware item to save.
-        :return: None
-        :rtype: None
-        """
-        try:
-            self.dao.do_update(
-                self.tree.get_node(node_id).data['similar_item'])
-
-            pub.sendMessage(
-                'succeed_update_similar_item',
-                tree=self.tree,
-            )
-        except AttributeError:
-            _method_name: str = inspect.currentframe(  # type: ignore
-            ).f_code.co_name
-            _error_msg = ('{1}: Attempted to save non-existent similar item '
-                          'record ID {0}.').format(str(node_id), _method_name)
-            pub.sendMessage(
-                'do_log_debug',
-                logger_name='DEBUG',
-                message=_error_msg,
-            )
-            pub.sendMessage(
-                'fail_update_similar_item',
-                error_message=_error_msg,
-            )
-        except KeyError:
-            _method_name: str = inspect.currentframe(  # type: ignore
-            ).f_code.co_name
-            _error_msg = ('{1}: No data package found for similar item record '
-                          'ID {0}.').format(str(node_id), _method_name)
-            pub.sendMessage(
-                'do_log_debug',
-                logger_name='DEBUG',
-                message=_error_msg,
-            )
-            pub.sendMessage(
-                'fail_update_similar_item',
-                error_message=_error_msg,
-            )
-        except TypeError:
-            if node_id != 0:
-                _method_name: str = inspect.currentframe(  # type: ignore
-                ).f_code.co_name
-                _error_msg = ('{1}: The value for one or more attributes for '
-                              'similar item record ID {0} was the wrong '
-                              'type.').format(str(node_id), _method_name)
-                pub.sendMessage(
-                    'do_log_debug',
-                    logger_name='DEBUG',
-                    message=_error_msg,
-                )
-                pub.sendMessage(
-                    'fail_update_similar_item',
-                    error_message=_error_msg,
-                )
 
     def _do_delete(self, node_id: int) -> None:
         """Remove a similar item record.

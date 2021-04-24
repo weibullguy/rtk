@@ -3,7 +3,6 @@ from typing import Any, Dict
 
 # RAMSTK Package Imports
 from ramstk.controllers import RAMSTKDataManager as RAMSTKDataManager
-from ramstk.exceptions import DataAccessError as DataAccessError
 from ramstk.models.commondb import RAMSTKSiteInfo as RAMSTKSiteInfo
 
 class DataManager(RAMSTKDataManager):
@@ -19,7 +18,4 @@ class DataManager(RAMSTKDataManager):
         ...
 
     def do_select_all(self, attributes: Dict[str, Any]) -> None:
-        ...
-
-    def do_update(self, node_id: str) -> None:
         ...

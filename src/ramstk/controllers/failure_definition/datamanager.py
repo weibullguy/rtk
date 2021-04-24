@@ -56,12 +56,10 @@ class DataManager(RAMSTKDataManager):
                       'request_set_failure_definition_attributes')
         pub.subscribe(super().do_set_attributes,
                       'lvw_editing_failure_definition')
-        pub.subscribe(super().do_update_all,
-                      'request_update_all_failure_definitionss')
+        pub.subscribe(super().do_update, 'request_update_failure_definition')
 
         pub.subscribe(self.do_get_tree, 'request_get_failure_definition_tree')
         pub.subscribe(self.do_select_all, 'selected_revision')
-        pub.subscribe(self.do_update, 'request_update_failure_definitions')
 
         pub.subscribe(self._do_delete, 'request_delete_failure_definitions')
         pub.subscribe(self._do_insert_failure_definition,
@@ -105,67 +103,6 @@ class DataManager(RAMSTKDataManager):
             'succeed_retrieve_failure_definitions',
             tree=self.tree,
         )
-
-    def do_update(self, node_id: int) -> None:
-        """Update the failure definition associated with node ID in database.
-
-        :param node_id: the node (failure definition) ID of the failure
-            definition to save.
-        :return: None
-        :rtype: None
-        """
-        _method_name: str = inspect.currentframe(  # type: ignore
-        ).f_code.co_name
-
-        try:
-            self.dao.do_update(
-                self.tree.get_node(node_id).data['failure_definition'])
-
-            pub.sendMessage(
-                'succeed_update_failure_definitions',
-                tree=self.tree,
-            )
-        except AttributeError:
-            _error_msg: str = (
-                '{1}: Attempted to save non-existent failure definition with '
-                'failure definition ID {0}.').format(str(node_id),
-                                                     _method_name)
-            pub.sendMessage(
-                'do_log_debug',
-                logger_name='DEBUG',
-                message=_error_msg,
-            )
-            pub.sendMessage(
-                'fail_update_failure_definition',
-                error_message=_error_msg,
-            )
-        except KeyError:
-            _error_msg = (
-                '{1}: No data package found for failure definition ID {0}.'
-            ).format(str(node_id), _method_name)
-            pub.sendMessage(
-                'do_log_debug',
-                logger_name='DEBUG',
-                message=_error_msg,
-            )
-            pub.sendMessage(
-                'fail_update_failure_definition',
-                error_message=_error_msg,
-            )
-        except (DataAccessError, TypeError):
-            if node_id != 0:
-                _error_msg = ('{1}: The value for one or more attributes for '
-                              'failure definition ID {0} was the wrong '
-                              'type.').format(str(node_id), _method_name)
-                pub.sendMessage(
-                    'do_log_debug',
-                    logger_name='DEBUG',
-                    message=_error_msg,
-                )
-                pub.sendMessage(
-                    'fail_update_failure_definition',
-                    error_message=_error_msg,
-                )
 
     def _do_delete(self, node_id: int) -> None:
         """Remove a failure definition.

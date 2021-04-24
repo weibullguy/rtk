@@ -26,9 +26,6 @@ class DataManager(RAMSTKDataManager):
     def do_set_all_attributes(self, attributes: Dict[str, Any]) -> None:
         ...
 
-    def do_update(self, node_id: int) -> None:
-        ...
-
     def _do_delete(self, node_id: int) -> None:
         ...
 

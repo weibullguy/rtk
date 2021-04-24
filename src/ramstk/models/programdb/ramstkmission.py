@@ -56,11 +56,11 @@ class RAMSTKMission(RAMSTK_BASE, RAMSTKBaseTable):
                         default=__defaults__['time_units'])
 
     # Define the relationships to other tables in the RAMSTK Program database.
-    revision = relationship(  # type: ignore
+    revision: relationship = relationship(
         'RAMSTKRevision',
         back_populates='mission',
     )
-    phase = relationship(  # type: ignore
+    phase: relationship = relationship(
         'RAMSTKMissionPhase',
         back_populates='mission',
     )

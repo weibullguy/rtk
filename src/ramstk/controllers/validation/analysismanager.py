@@ -258,9 +258,9 @@ class AnalysisManager(RAMSTKAnalysisManager):
         """
         _dic_actual = {}
         for _node in self._status_tree.all_nodes()[1:]:
-            _dic_actual[pd.to_datetime(_node.data["status"].date_status)] = [
-                _node.data["status"].cost_remaining,
-                _node.data["status"].time_remaining,
+            _dic_actual[pd.to_datetime(_node.data["program_status"].date_status)] = [
+                _node.data["program_status"].cost_remaining,
+                _node.data["program_status"].time_remaining,
             ]
 
         # noinspection PyTypeChecker

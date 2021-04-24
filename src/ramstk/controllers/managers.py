@@ -4,7 +4,7 @@
 #
 # All rights reserved.
 # Copyright 2007 - 2021 Doyle Rowland doyle.rowland <AT> reliaqual <DOT> com
-"""Hardware Controller Package analysis manager."""
+"""Hardware Controller Package managers."""
 
 # Standard Library Imports
 import inspect
@@ -18,6 +18,7 @@ from pubsub import pub
 # RAMSTK Package Imports
 from ramstk.configuration import RAMSTKUserConfiguration
 from ramstk.db.base import BaseDatabase
+from ramstk.exceptions import DataAccessError
 
 
 class RAMSTKAnalysisManager:
@@ -134,9 +135,11 @@ class RAMSTKDataManager:
 
         # Subscribe to PyPubSub messages.
         pub.subscribe(self.do_connect, 'succeed_connect_program_database')
-        pub.subscribe(self.do_update_all, 'request_save_project')
         pub.subscribe(self.do_set_tree,
-                      'succeed_calculate_{0}'.format(self._tag))
+                      'succeed_calculate_{}'.format(self._tag))
+        pub.subscribe(self.do_update_all,
+                      'request_update_all_{}'.format(self._tag))
+        pub.subscribe(self.do_update_all, 'request_save_project')
 
     def do_connect(self, dao: BaseDatabase) -> None:
         """Connect data manager to a database.
@@ -284,7 +287,66 @@ class RAMSTKDataManager:
         """
         self.tree = tree
 
+    def do_update(self, node_id: int, table: str) -> None:
+        """Update record associated with node ID in RAMSTK Program database.
+
+        :param node_id: the node ID of the record to save.
+        :param table: the table in the database to update.
+        :return: None
+        :rtype: None
+        """
+        _method_name: str = inspect.currentframe(  # type: ignore
+        ).f_code.co_name
+
+        try:
+            self.dao.do_update(self.tree.get_node(node_id).data[table])
+            pub.sendMessage(
+                'succeed_update_{}'.format(table),
+                tree=self.tree,
+            )
+        except AttributeError:
+            _error_msg: str = (
+                '{1}: Attempted to save non-existent {2} with {2} ID {0}.'
+            ).format(str(node_id), _method_name, table.replace('_', ' '))
+            pub.sendMessage(
+                'do_log_debug',
+                logger_name='DEBUG',
+                message=_error_msg,
+            )
+            pub.sendMessage(
+                'fail_update_{}'.format(table),
+                error_message=_error_msg,
+            )
+        except KeyError:
+            _error_msg = ('{1}: No data package found for {2} ID {0}.').format(
+                str(node_id), _method_name, table.replace('_', ' '))
+            pub.sendMessage(
+                'do_log_debug',
+                logger_name='DEBUG',
+                message=_error_msg,
+            )
+            pub.sendMessage(
+                'fail_update_{}'.format(table),
+                error_message=_error_msg,
+            )
+        except (DataAccessError, TypeError):
+            if node_id != 0:
+                _error_msg = ('{1}: The value for one or more attributes for '
+                              '{2} ID {0} was the wrong type.').format(
+                                  str(node_id), _method_name,
+                                  table.replace('_', ' '))
+                pub.sendMessage(
+                    'do_log_debug',
+                    logger_name='DEBUG',
+                    message=_error_msg,
+                )
+                pub.sendMessage(
+                    'fail_update_{}'.format(table),
+                    error_message=_error_msg,
+                )
+
     # noinspection PyUnresolvedReferences
+    # pylint: disable=no-value-for-parameter
     def do_update_all(self) -> None:
         """Update all MODULE data table records in the RAMSTK Program database.
 
@@ -292,5 +354,10 @@ class RAMSTKDataManager:
         :rtype: None
         """
         for _node in self.tree.all_nodes():
-            self.do_update(_node.identifier)  # type: ignore
+            try:
+                self.do_update(_node.identifier,
+                               table=self._tag[:-1])  # type: ignore
+            except TypeError:
+                self.do_update(_node.identifier)  # type: ignore
+
         pub.sendMessage('succeed_update_all')
